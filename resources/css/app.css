@@ -1,0 +1,88 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Ensure no horizontal layout scrollbar across all devices */
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+/* User-requested whitespace-overwarp text wrapping utility */
+.whitespace-overwarp,
+.whitespace-over-warp {
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Global custom scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.6);
+}
+
+/* Custom scrollbars for Kurogane Navy (#0B132B) sidebar & dark panels */
+.scrollbar-dark {
+    scrollbar-width: thin;
+    scrollbar-color: #1e293b #0B132B;
+}
+.scrollbar-dark::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.scrollbar-dark::-webkit-scrollbar-track {
+    background: #0B132B;
+}
+.scrollbar-dark::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+    border: 1px solid #0B132B;
+}
+.scrollbar-dark::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Custom scrollbars for tables & modals */
+.table-scroll-container,
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f8fafc;
+}
+.table-scroll-container::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.table-scroll-container::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 9999px;
+}
+.table-scroll-container::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+.table-scroll-container::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
