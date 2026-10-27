@@ -117,14 +117,11 @@ class RoleBasedNavigationTest extends TestCase
         );
     }
 
-    public function test_guest_user_has_null_auth(): void
+    public function test_guest_is_redirected_to_login_from_dashboard(): void
     {
         $response = $this->get('/dashboard');
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page
-            ->where('auth.user', null)
-        );
+        $response->assertRedirect('/login');
     }
 
     public function test_can_access_module_hub_routes(): void

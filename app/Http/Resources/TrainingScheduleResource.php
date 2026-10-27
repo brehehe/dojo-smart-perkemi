@@ -28,6 +28,12 @@ class TrainingScheduleResource extends JsonResource
                 'name' => $this->dojo->name,
                 'code' => $this->dojo->code,
                 'pengprov' => $this->dojo->pengprov,
+                'pengkab' => $this->dojo->pengkab,
+                'address' => $this->dojo->address,
+                'city' => $this->dojo->city,
+                'latitude' => $this->dojo->latitude,
+                'longitude' => $this->dojo->longitude,
+                'google_maps_url' => $this->dojo->metadata['google_maps_url'] ?? null,
             ] : null),
             'title' => $this->title,
             'program_type' => $this->program_type ? [

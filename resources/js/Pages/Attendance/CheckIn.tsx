@@ -11,11 +11,14 @@ import {
     AlertCircle,
     ArrowLeft,
     ArrowRight,
+    Building2,
     Camera,
     Check,
     CheckCircle2,
     Clock,
     Compass,
+    ExternalLink,
+    LocateFixed,
     MapPin,
     Navigation,
     RefreshCw,
@@ -81,6 +84,26 @@ export default function AttendanceCheckIn({
     const [gpsError, setGpsError] = useState<string | null>(null);
     const [distanceMeters, setDistanceMeters] = useState<number | null>(null);
 
+    // Resolved Tatami Location Info
+    const tatamiLat = schedule?.latitude ?? schedule?.dojo?.latitude ?? null;
+    const tatamiLng = schedule?.longitude ?? schedule?.dojo?.longitude ?? null;
+    const tatamiAddress = schedule?.dojo?.address || null;
+    const tatamiCity = schedule?.dojo?.city || schedule?.dojo?.pengkab || null;
+    const tatamiPengprov = schedule?.dojo?.pengprov || null;
+    const tatamiLocationName = schedule?.location_name || schedule?.dojo?.name || 'Tatami Dojo';
+    const tatamiRadius = schedule?.radius_meters || 150;
+
+    const googleMapsTatamiUrl =
+        schedule?.dojo?.google_maps_url ||
+        (tatamiLat && tatamiLng
+            ? `https://www.google.com/maps?q=${tatamiLat},${tatamiLng}`
+            : null);
+
+    const googleMapsNavUrl =
+        gpsCoordinates.latitude && gpsCoordinates.longitude && tatamiLat && tatamiLng
+            ? `https://www.google.com/maps/dir/?api=1&origin=${gpsCoordinates.latitude},${gpsCoordinates.longitude}&destination=${tatamiLat},${tatamiLng}`
+            : googleMapsTatamiUrl;
+
     // Form setup
     const { data, setData, post, processing, errors } = useForm({
         training_schedule_id: schedule?.id || '',
@@ -137,8 +160,8 @@ export default function AttendanceCheckIn({
                     location_accuracy: acc,
                 }));
 
-                if (schedule?.latitude && schedule?.longitude) {
-                    const dist = calculateDistance(lat, lng, schedule.latitude, schedule.longitude);
+                if (tatamiLat && tatamiLng) {
+                    const dist = calculateDistance(lat, lng, tatamiLat, tatamiLng);
                     setDistanceMeters(dist);
                 }
 
@@ -284,16 +307,16 @@ export default function AttendanceCheckIn({
 
     // Re-check distance whenever schedule changes
     useEffect(() => {
-        if (schedule?.latitude && schedule?.longitude && gpsCoordinates.latitude && gpsCoordinates.longitude) {
+        if (tatamiLat && tatamiLng && gpsCoordinates.latitude && gpsCoordinates.longitude) {
             const dist = calculateDistance(
                 gpsCoordinates.latitude,
                 gpsCoordinates.longitude,
-                schedule.latitude,
-                schedule.longitude
+                tatamiLat,
+                tatamiLng
             );
             setDistanceMeters(dist);
         }
-    }, [schedule?.id, gpsCoordinates.latitude, gpsCoordinates.longitude]);
+    }, [schedule?.id, tatamiLat, tatamiLng, gpsCoordinates.latitude, gpsCoordinates.longitude]);
 
     const submitAttendance = (e: React.FormEvent) => {
         e.preventDefault();
@@ -305,9 +328,10 @@ export default function AttendanceCheckIn({
         post('/attendance');
     };
 
-    const isWithinRadius = distanceMeters !== null && schedule?.radius_meters
-        ? distanceMeters <= schedule.radius_meters
-        : false;
+    const isWithinRadius =
+        distanceMeters !== null && tatamiRadius
+            ? distanceMeters <= tatamiRadius
+            : false;
 
     return (
         <AppLayout>
@@ -332,32 +356,105 @@ export default function AttendanceCheckIn({
                     )}
                 </div>
 
-                {/* Session Context Banner */}
+                {/* Session Context Banner with Rich Location Detail */}
                 {schedule && (
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-white mb-5 shadow-sm">
-                        <div className="flex items-center justify-between gap-2 mb-1.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 text-white mb-5 shadow-sm space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
                                 <Shield className="w-3.5 h-3.5" />
-                                <span>{schedule.dojo?.name}</span>
+                                <span>{schedule.dojo?.name || 'PERKEMI'}</span>
                             </span>
                             <Badge variant="rose" size="sm">
                                 {schedule.program_type?.label || 'Rutin'}
                             </Badge>
                         </div>
-                        <h2 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
-                            {schedule.title}
-                        </h2>
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300 mt-2">
-                            <span className="flex items-center gap-1">
-                                <Clock className="w-3.5 h-3.5 text-red-400" />
-                                <span>{schedule.start_time} - {schedule.end_time} WIB</span>
-                            </span>
-                            <span>•</span>
-                            <span className="flex items-center gap-1 truncate">
-                                <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                                <span className="truncate">{schedule.location_name || 'Tatami Dojo'}</span>
-                            </span>
+
+                        <div>
+                            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                                {schedule.title}
+                            </h2>
+                            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                                <span>
+                                    {schedule.date
+                                        ? new Date(schedule.date).toLocaleDateString('id-ID', {
+                                              weekday: 'long',
+                                              day: 'numeric',
+                                              month: 'long',
+                                              year: 'numeric',
+                                          })
+                                        : 'Hari ini'}{' '}
+                                    • {schedule.start_time} - {schedule.end_time} WIB
+                                </span>
+                            </p>
                         </div>
+
+                        {/* Location Detail Box */}
+                        <div className="bg-slate-800/90 rounded-xl p-3 border border-slate-700/80 space-y-2">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="space-y-1 min-w-0">
+                                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+                                        <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
+                                        <span className="truncate">{tatamiLocationName}</span>
+                                    </div>
+                                    {(tatamiAddress || tatamiCity) && (
+                                        <p className="text-[11px] text-slate-300 leading-relaxed pl-5">
+                                            {tatamiAddress}
+                                            {tatamiCity ? `, ${tatamiCity}` : ''}
+                                            {tatamiPengprov ? `, ${tatamiPengprov}` : ''}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {googleMapsTatamiUrl && (
+                                    <a
+                                        href={googleMapsTatamiUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 text-[11px] font-semibold border border-amber-500/30 transition-colors"
+                                    >
+                                        <MapPin className="w-3 h-3 text-amber-400" />
+                                        <span>Maps</span>
+                                        <ExternalLink className="w-3 h-3 opacity-70" />
+                                    </a>
+                                )}
+                            </div>
+
+                            {tatamiLat && tatamiLng && (
+                                <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1.5 border-t border-slate-700/60 font-mono">
+                                    <span>
+                                        Koordinat: {tatamiLat}, {tatamiLng}
+                                    </span>
+                                    <span className="text-emerald-400 font-sans font-semibold">
+                                        Radius: {tatamiRadius}m
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Session Switcher if multiple available schedules */}
+                        {availableSchedules.length > 1 && (
+                            <div className="pt-1 flex items-center justify-between gap-2 text-[11px] text-slate-400 border-t border-slate-800/80">
+                                <span>Pilihan Sesi Latihan:</span>
+                                <select
+                                    value={schedule.id}
+                                    onChange={(e) =>
+                                        router.get(
+                                            '/attendance/check-in',
+                                            { schedule_id: e.target.value },
+                                            { preserveState: false }
+                                        )
+                                    }
+                                    className="bg-slate-800 text-white text-[11px] rounded-lg border-slate-700 py-1 px-2 max-w-[210px] truncate focus:border-red-500 focus:ring-red-500"
+                                >
+                                    {availableSchedules.map((s) => (
+                                        <option key={s.id} value={s.id}>
+                                            {s.date} ({s.start_time}) - {s.title}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -607,7 +704,7 @@ export default function AttendanceCheckIn({
                                         Langkah 2: Verifikasi Lokasi GPS
                                     </h3>
                                     <p className="text-[10px] text-slate-400">
-                                        Geotagging koordinat tatami dan kalkulasi jarak radius
+                                        Detail lokasi sasaran tatami dan verifikasi posisi GPS kenshi
                                     </p>
                                 </div>
                             </div>
@@ -621,13 +718,13 @@ export default function AttendanceCheckIn({
                                 className="text-xs text-white border-slate-700 hover:bg-slate-800"
                                 leftIcon={<RefreshCw className="w-3 h-3" />}
                             >
-                                Perbarui
+                                Perbarui GPS
                             </Button>
                         </CardHeader>
 
                         <CardContent className="p-4 sm:p-5 space-y-4">
                             {/* GPS Status / Error */}
-                            {gpsError ? (
+                            {gpsError && (
                                 <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-2">
                                     <div className="flex items-start gap-2.5">
                                         <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
@@ -649,74 +746,212 @@ export default function AttendanceCheckIn({
                                         </Button>
                                     </div>
                                 </div>
-                            ) : (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
-                                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                            )}
+
+                            {/* DETAIL LOKASI TATAMI TARGET (DOJO PRESENSI) */}
+                            <div className="bg-gradient-to-br from-slate-50 to-amber-50/40 rounded-2xl border border-amber-200/80 p-4 space-y-3">
+                                <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-6 w-6 rounded-md bg-amber-100 text-amber-700 flex items-center justify-center">
+                                            <Building2 className="w-3.5 h-3.5" />
+                                        </div>
+                                        <span className="text-xs font-bold text-slate-900">
+                                            Detail Lokasi Tatami (Titik Sasaran)
+                                        </span>
+                                    </div>
+                                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                                        Radius: {tatamiRadius}m
+                                    </span>
+                                </div>
+
+                                {/* Venue Name & Full Address */}
+                                <div className="space-y-1 bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs">
+                                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
+                                        <MapPin className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                                        <span>{tatamiLocationName}</span>
+                                    </div>
+                                    {(tatamiAddress || tatamiCity) && (
+                                        <p className="text-[11px] text-slate-600 leading-relaxed pl-5">
+                                            {tatamiAddress}
+                                            {tatamiCity ? `, ${tatamiCity}` : ''}
+                                            {tatamiPengprov ? `, ${tatamiPengprov}` : ''}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Official Tatami Coordinates */}
+                                {tatamiLat && tatamiLng && (
+                                    <div className="grid grid-cols-2 gap-2 text-xs">
+                                        <div className="p-2.5 rounded-xl bg-white border border-slate-200/80">
+                                            <span className="text-[10px] text-slate-500 uppercase font-bold block mb-0.5">
+                                                Latitude Resmi Tatami
+                                            </span>
+                                            <span className="font-semibold text-slate-900 font-mono text-xs">
+                                                {tatamiLat}
+                                            </span>
+                                        </div>
+                                        <div className="p-2.5 rounded-xl bg-white border border-slate-200/80">
+                                            <span className="text-[10px] text-slate-500 uppercase font-bold block mb-0.5">
+                                                Longitude Resmi Tatami
+                                            </span>
+                                            <span className="font-semibold text-slate-900 font-mono text-xs">
+                                                {tatamiLng}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Interactive Visual Map Embed */}
+                                {tatamiLat && tatamiLng && (
+                                    <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 h-44 shadow-2xs">
+                                        <iframe
+                                            title="Peta Lokasi Tatami"
+                                            width="100%"
+                                            height="100%"
+                                            frameBorder="0"
+                                            scrolling="no"
+                                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(tatamiLng) - 0.005}%2C${Number(tatamiLat) - 0.003}%2C${Number(tatamiLng) + 0.005}%2C${Number(tatamiLat) + 0.003}&layer=mapnik&marker=${tatamiLat}%2C${tatamiLng}`}
+                                            className="w-full h-full"
+                                        />
+                                        <div className="absolute top-2 left-2 bg-slate-900/85 backdrop-blur-xs text-white px-2.5 py-1 rounded-md text-[10px] font-semibold flex items-center gap-1 shadow-sm">
+                                            <MapPin className="w-3 h-3 text-red-400" />
+                                            <span className="truncate max-w-[200px]">{tatamiLocationName}</span>
+                                        </div>
+                                        {googleMapsTatamiUrl && (
+                                            <a
+                                                href={googleMapsTatamiUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="absolute bottom-2 right-2 bg-white/95 hover:bg-white text-slate-800 px-2.5 py-1 rounded-md text-[10px] font-bold shadow-xs border border-slate-200 flex items-center gap-1 transition-colors"
+                                            >
+                                                <ExternalLink className="w-3 h-3 text-blue-600" />
+                                                <span>Buka di Google Maps</span>
+                                            </a>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Quick Maps & Direction Action Buttons */}
+                                <div className="flex flex-wrap items-center gap-2 pt-1">
+                                    {googleMapsTatamiUrl && (
+                                        <a
+                                            href={googleMapsTatamiUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-800 text-xs font-semibold shadow-2xs transition-colors"
+                                        >
+                                            <MapPin className="w-3.5 h-3.5 text-red-600" />
+                                            <span>Titik Tatami (Google Maps)</span>
+                                            <ExternalLink className="w-3 h-3 text-slate-400" />
+                                        </a>
+                                    )}
+
+                                    {gpsCoordinates.latitude && gpsCoordinates.longitude && googleMapsNavUrl && (
+                                        <a
+                                            href={googleMapsNavUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 text-xs font-semibold shadow-2xs transition-colors"
+                                        >
+                                            <Navigation className="w-3.5 h-3.5 text-blue-600" />
+                                            <span>Petunjuk Arah Navigasi</span>
+                                            <ExternalLink className="w-3 h-3 text-blue-400" />
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* DETAIL POSISI GPS KENSHI TERDETEKSI */}
+                            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-3">
+                                <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-6 w-6 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center">
+                                            <LocateFixed className="w-3.5 h-3.5" />
+                                        </div>
+                                        <span className="text-xs font-bold text-slate-900">
+                                            Posisi GPS Anda (Kenshi Terdeteksi)
+                                        </span>
+                                    </div>
+                                    <span
+                                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                            gpsCoordinates.latitude
+                                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                                : 'bg-slate-200 text-slate-700'
+                                        }`}
+                                    >
+                                        {gpsCoordinates.latitude ? 'GPS Aktif' : 'Mencari Sinyal...'}
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                                    <div className="p-3 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
                                         <span className="text-[10px] text-slate-500 uppercase font-bold block mb-0.5">
-                                            Latitude
+                                            Latitude Anda
                                         </span>
                                         <span className="font-semibold text-slate-900 font-mono text-xs">
                                             {gpsCoordinates.latitude !== null ? gpsCoordinates.latitude : 'Mencari...'}
                                         </span>
                                     </div>
 
-                                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                                    <div className="p-3 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
                                         <span className="text-[10px] text-slate-500 uppercase font-bold block mb-0.5">
-                                            Longitude
+                                            Longitude Anda
                                         </span>
                                         <span className="font-semibold text-slate-900 font-mono text-xs">
                                             {gpsCoordinates.longitude !== null ? gpsCoordinates.longitude : 'Mencari...'}
                                         </span>
                                     </div>
 
-                                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 col-span-2 sm:col-span-1">
+                                    <div className="p-3 rounded-xl bg-white border border-slate-200/80 shadow-2xs col-span-2 sm:col-span-1">
                                         <span className="text-[10px] text-slate-500 uppercase font-bold block mb-0.5">
-                                            Akurasi GPS
+                                            Akurasi Sensor
                                         </span>
                                         <span className="font-semibold text-slate-900 text-xs">
                                             {gpsCoordinates.accuracy !== null ? `± ${gpsCoordinates.accuracy} m` : '-'}
                                         </span>
                                     </div>
                                 </div>
-                            )}
 
-                            {/* Distance & Geofence Radius Gauge */}
-                            {distanceMeters !== null && schedule?.radius_meters ? (
-                                <div
-                                    className={`p-4 rounded-xl border flex items-center justify-between gap-3 ${
-                                        isWithinRadius
-                                            ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                                            : 'bg-amber-50 border-amber-200 text-amber-900'
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div
-                                            className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
-                                                isWithinRadius ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'
-                                            }`}
-                                        >
-                                            <Navigation className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold">
-                                                Jarak Anda: {distanceMeters} Meter ke Tatami
-                                            </p>
-                                            <p className="text-[11px] opacity-80 mt-0.5">
-                                                Radius resmi dojo: {schedule.radius_meters} meter.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span
-                                        className={`text-[10px] uppercase font-bold px-2.5 py-1 rounded-full shrink-0 ${
+                                {/* Distance & Geofence Radius Gauge */}
+                                {distanceMeters !== null ? (
+                                    <div
+                                        className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 ${
                                             isWithinRadius
-                                                ? 'bg-emerald-200 text-emerald-800'
-                                                : 'bg-amber-200 text-amber-800'
+                                                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                                                : 'bg-amber-50 border-amber-200 text-amber-900'
                                         }`}
                                     >
-                                        {isWithinRadius ? 'Di Dalam Radius' : 'Di Luar Radius'}
-                                    </span>
-                                </div>
-                            ) : null}
+                                        <div className="flex items-center gap-3">
+                                            <div
+                                                className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 ${
+                                                    isWithinRadius
+                                                        ? 'bg-emerald-100 text-emerald-600'
+                                                        : 'bg-amber-100 text-amber-600'
+                                                }`}
+                                            >
+                                                <Navigation className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold">
+                                                    Jarak Anda: {distanceMeters} Meter ke Tatami
+                                                </p>
+                                                <p className="text-[11px] opacity-80 mt-0.5">
+                                                    Batas radius toleransi: {tatamiRadius} meter.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span
+                                            className={`text-[10px] uppercase font-bold px-2.5 py-1 rounded-full shrink-0 ${
+                                                isWithinRadius
+                                                    ? 'bg-emerald-200 text-emerald-800'
+                                                    : 'bg-amber-200 text-amber-800'
+                                            }`}
+                                        >
+                                            {isWithinRadius ? 'Di Dalam Radius' : 'Di Luar Radius'}
+                                        </span>
+                                    </div>
+                                ) : null}
+                            </div>
 
                             {/* Thumbnail of Captured Photo */}
                             {capturedPhoto && (
@@ -725,7 +960,7 @@ export default function AttendanceCheckIn({
                                         <img
                                             src={capturedPhoto}
                                             alt="Selfie"
-                                            className="h-12 w-12 rounded-lg object-cover border border-slate-200"
+                                            className="h-12 w-12 rounded-lg object-cover border border-slate-200 shadow-2xs"
                                         />
                                         <div>
                                             <span className="text-xs font-bold text-slate-900 block">
@@ -794,58 +1029,119 @@ export default function AttendanceCheckIn({
 
                         <CardContent className="p-4 sm:p-5">
                             <form onSubmit={submitAttendance} className="space-y-4">
-                                {/* Summary Overview: Foto & GPS */}
-                                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-3">
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        {capturedPhoto && (
-                                            <img
-                                                src={capturedPhoto}
-                                                alt="Selfie"
-                                                className="h-12 w-12 sm:h-14 sm:w-14 rounded-lg object-cover border border-slate-200 shadow-2xs shrink-0"
-                                            />
-                                        )}
-                                        <div className="min-w-0">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="text-xs sm:text-sm font-bold text-slate-900 block truncate">
-                                                    Foto Selfie & Geotag Terlampir
-                                                </span>
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                                    Hadir
+                                {/* Summary Overview: Foto & Detail Lokasi */}
+                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            {capturedPhoto && (
+                                                <img
+                                                    src={capturedPhoto}
+                                                    alt="Selfie"
+                                                    className="h-14 w-14 rounded-lg object-cover border border-slate-200 shadow-2xs shrink-0"
+                                                />
+                                            )}
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className="text-xs sm:text-sm font-bold text-slate-900 block truncate">
+                                                        Foto Selfie & Geotag Terlampir
+                                                    </span>
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                                        Hadir
+                                                    </span>
+                                                </div>
+                                                <span className="text-[11px] text-slate-500 block truncate mt-0.5">
+                                                    {distanceMeters !== null
+                                                        ? `Jarak ke Tatami: ${distanceMeters}m (${isWithinRadius ? 'Dalam Radius Tatami' : 'Luar Radius'})`
+                                                        : 'Koordinat GPS tervalidasi'}
                                                 </span>
                                             </div>
-                                            <span className="text-[11px] text-slate-500 block truncate">
-                                                {distanceMeters !== null
-                                                    ? `Jarak ke Tatami: ${distanceMeters}m (${isWithinRadius ? 'Dalam Radius Tatami' : 'Luar Radius'})`
-                                                    : 'Koordinat GPS tervalidasi'}
-                                            </span>
                                         </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setCurrentStep(1)}
+                                            className="text-xs text-red-600 hover:text-red-700 hover:underline font-semibold shrink-0 px-2 py-1"
+                                        >
+                                            Ubah
+                                        </button>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setCurrentStep(1)}
-                                        className="text-xs text-red-600 hover:text-red-700 hover:underline font-semibold shrink-0 px-2 py-1"
-                                    >
-                                        Ubah
-                                    </button>
+
+                                    {/* Location Summary Breakdown */}
+                                    <div className="pt-2.5 border-t border-slate-200/80 text-xs space-y-1">
+                                        <div className="flex items-start gap-1.5 text-slate-700">
+                                            <MapPin className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
+                                            <div className="min-w-0">
+                                                <span className="font-semibold text-slate-900 block truncate">
+                                                    {tatamiLocationName}
+                                                </span>
+                                                {(tatamiAddress || tatamiCity) && (
+                                                    <span className="text-[11px] text-slate-500 block leading-tight">
+                                                        {tatamiAddress}
+                                                        {tatamiCity ? `, ${tatamiCity}` : ''}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {tatamiLat && tatamiLng && (
+                                            <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-1 pl-5">
+                                                <span>
+                                                    Titik: {tatamiLat}, {tatamiLng}
+                                                </span>
+                                                {googleMapsTatamiUrl && (
+                                                    <a
+                                                        href={googleMapsTatamiUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:underline font-sans inline-flex items-center gap-0.5"
+                                                    >
+                                                        <span>Maps</span>
+                                                        <ExternalLink className="w-2.5 h-2.5" />
+                                                    </a>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
-                                {/* Kenshi Selector (preselected) */}
+                                {/* Kenshi Selector / Locked Identity */}
                                 <div>
                                     <label className="text-xs font-semibold text-slate-700 block mb-1">
                                         Kenshi yang Melakukan Presensi
                                     </label>
-                                    <select
-                                        value={data.kenshi_id}
-                                        onChange={(e) => setData('kenshi_id', e.target.value)}
-                                        className="w-full text-xs sm:text-sm rounded-lg border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 shadow-2xs"
-                                    >
-                                        {kenshis.map((k) => (
-                                            <option key={k.id} value={k.id}>
-                                                {k.full_name} ({k.id_card_number}) • {k.rank?.label || 'Kenshi'}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    {currentKenshi ? (
+                                        <div className="w-full rounded-lg border border-slate-200 bg-slate-50 p-3 flex items-center justify-between shadow-2xs">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="h-9 w-9 rounded-full bg-red-100 text-red-700 font-bold flex items-center justify-center text-xs shrink-0">
+                                                    {currentKenshi.full_name?.charAt(0) || 'K'}
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs sm:text-sm font-bold text-slate-900 block leading-tight">
+                                                        {currentKenshi.full_name} ({currentKenshi.id_card_number})
+                                                    </span>
+                                                    <span className="text-[11px] text-slate-500 block mt-0.5">
+                                                        {currentKenshi.rank?.label || 'Kenshi'} • {currentKenshi.dojo?.name || schedule?.dojo?.name || 'PERKEMI'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 shrink-0">
+                                                <Shield className="w-3 h-3 text-red-600" />
+                                                Identitas Anda
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <select
+                                            value={data.kenshi_id}
+                                            onChange={(e) => setData('kenshi_id', e.target.value)}
+                                            className="w-full text-xs sm:text-sm rounded-lg border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 shadow-2xs"
+                                        >
+                                            {kenshis.map((k) => (
+                                                <option key={k.id} value={k.id}>
+                                                    {k.full_name} ({k.id_card_number}) • {k.rank?.label || 'Kenshi'}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
                                 </div>
 
                                 {/* Status Kehadiran: di-hide untuk menyederhanakan alur presensi tatami (default otomatis 'present') */}

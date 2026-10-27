@@ -32,6 +32,8 @@ Route::get('/dojo', function () {
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
@@ -41,8 +43,8 @@ Route::get('/coaches', [KenshiController::class, 'coaches'])->name('coaches.inde
 
 // Protected portals & administrative actions
 Route::middleware('auth')->group(function (): void {
-// National Executive Dashboard & Command Center
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // National Executive Dashboard & Command Center
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Dojo directory & analytics (authenticated members only)
     Route::get('/dojos', [DojoController::class, 'index'])->name('dojos.index');
@@ -101,7 +103,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
     Route::post('/attendance/permit', [AttendanceController::class, 'submitPermit'])->name('attendance.permit');
     Route::post('/attendance/{attendance}/approve', [AttendanceController::class, 'approvePermit'])->name('attendance.approve');
     Route::post('/attendance/override-status', [AttendanceController::class, 'overrideStatus'])->name('attendance.override');
-
 
     // Training Schedules & Calendar (Public / All Members)
     Route::get('/schedules', [TrainingScheduleController::class, 'index'])->name('schedules.index');

@@ -100,4 +100,57 @@ class MultiRolePortalTest extends TestCase
 
         $response->assertRedirect('/login');
     }
+
+    public function test_guest_can_view_registration_page_with_dojos(): void
+    {
+        Dojo::create([
+            'code' => 'DOJO-SBY-REG',
+            'name' => 'Dojo Surabaya Reg',
+            'pengprov' => 'Jawa Timur',
+            'pengkab' => 'Surabaya',
+            'status' => DojoStatus::Active,
+        ]);
+
+        $response = $this->get('/register');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Auth/Register')
+            ->has('dojos')
+            ->has('ranks')
+        );
+    }
+
+    public function test_guest_can_register_as_kenshi_with_dojo_selection(): void
+    {
+        $dojo = Dojo::create([
+            'code' => 'DOJO-SBY-NEW',
+            'name' => 'Dojo Surabaya Baru',
+            'pengprov' => 'Jawa Timur',
+            'pengkab' => 'Surabaya',
+            'status' => DojoStatus::Active,
+        ]);
+
+        $response = $this->post('/register', [
+            'full_name' => 'Kenshi Baru Surabaya',
+            'email' => 'kenshibaru@perkemi.id',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'dojo_id' => $dojo->id,
+            'gender' => 'M',
+            'rank' => 'minarai',
+            'phone' => '08123456789',
+        ]);
+
+        $response->assertRedirect('/portal/kenshi');
+        $this->assertAuthenticated();
+        $this->assertDatabaseHas('users', [
+            'email' => 'kenshibaru@perkemi.id',
+            'name' => 'Kenshi Baru Surabaya',
+        ]);
+        $this->assertDatabaseHas('kenshis', [
+            'full_name' => 'Kenshi Baru Surabaya',
+            'dojo_id' => $dojo->id,
+        ]);
+    }
 }

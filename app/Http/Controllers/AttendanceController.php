@@ -60,7 +60,10 @@ class AttendanceController extends Controller
 
         // 4. Kenshi roster for this schedule's dojo
         $kenshis = collect();
-        if ($schedule) {
+        if ($currentKenshi && $user && ! $user->hasAnyRole(['SuperAdmin', 'Sensei', 'PengprovAdmin', 'PengkabAdmin'])) {
+            // When a Kenshi performs attendance, only allow selecting themselves
+            $kenshis = collect([$currentKenshi]);
+        } elseif ($schedule) {
             $kenshis = Kenshi::where('dojo_id', $schedule->dojo_id)
                 ->where('is_active', true)
                 ->orderBy('full_name')
@@ -94,7 +97,18 @@ class AttendanceController extends Controller
      */
     public function store(StoreAttendanceRequest $request, RecordAttendanceAction $action): RedirectResponse
     {
-        $attendance = $action->execute($request->validated(), $request->user()?->id);
+        $validated = $request->validated();
+        $user = $request->user();
+
+        // Enforce that Kenshis can only submit attendance for their own profile
+        if ($user && ! $user->hasAnyRole(['SuperAdmin', 'Sensei', 'PengprovAdmin', 'PengkabAdmin'])) {
+            $kenshi = Kenshi::where('user_id', $user->id)->first();
+            if ($kenshi) {
+                $validated['kenshi_id'] = $kenshi->id;
+            }
+        }
+
+        $attendance = $action->execute($validated, $user?->id);
 
         $schedule = $attendance->schedule;
         $kenshi = $attendance->kenshi;

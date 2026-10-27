@@ -79,6 +79,12 @@ export interface TrainingSchedule {
         name: string;
         code: string;
         pengprov: string;
+        pengkab?: string | null;
+        address?: string | null;
+        city?: string | null;
+        google_maps_url?: string | null;
+        latitude?: number | null;
+        longitude?: number | null;
     } | null;
     title: string;
     program_type: {

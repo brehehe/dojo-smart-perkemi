@@ -108,7 +108,10 @@ class KenshiManagementTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->get("/kenshis/{$kenshi->id}");
+        $admin = User::factory()->create();
+        $admin->assignRole('SuperAdmin');
+
+        $response = $this->actingAs($admin)->get("/kenshis/{$kenshi->id}");
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page

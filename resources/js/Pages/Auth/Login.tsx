@@ -1,11 +1,11 @@
 import React from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Input } from '@/Components/UI/Forms/Input';
 import { Checkbox } from '@/Components/UI/Forms/Checkbox';
 import { Button } from '@/Components/UI/Elements/Button';
 import { Card, CardContent } from '@/Components/UI/Layout/Card';
 import { Alert } from '@/Components/UI/Feedback/Alert';
-import { LogIn, Shield } from 'lucide-react';
+import { LogIn, Shield, UserPlus } from 'lucide-react';
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
@@ -83,6 +83,17 @@ export default function Login() {
                             >
                                 Masuk ke Portal
                             </Button>
+
+                            <div className="pt-3 text-center border-t border-slate-100 text-xs text-slate-500">
+                                Belum terdaftar sebagai kenshi?{' '}
+                                <Link
+                                    href="/register"
+                                    className="font-bold text-red-600 hover:text-red-700 hover:underline inline-flex items-center gap-1"
+                                >
+                                    <UserPlus className="w-3.5 h-3.5" />
+                                    Registrasi Kenshi Baru
+                                </Link>
+                            </div>
                         </form>
                     </CardContent>
                 </Card>

@@ -142,10 +142,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             ],
         },
         {
-            title: 'Keuangan & Sistem',
+            title: 'Keuangan',
             items: [
                 { name: 'Finance & Accounting', href: '/finance', icon: Wallet, show: canViewFinance },
-                { name: 'System Logs', href: '/log-viewer', icon: Activity, external: true, show: canViewSystemLogs },
             ],
         },
     ];
@@ -336,15 +335,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                                         <p className="text-xs font-semibold text-slate-800">{auth.user.name}</p>
                                         <p className="text-[11px] text-slate-500 truncate">{auth.user.email}</p>
                                     </div>
-                                    {canViewSystemLogs && (
-                                        <a
-                                            href="/log-viewer"
-                                            className="flex items-center gap-2 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50"
-                                        >
-                                            <Activity className="w-4 h-4 text-slate-400" />
-                                            <span>Log Viewer</span>
-                                        </a>
-                                    )}
+
                                     <Link
                                         href="/logout"
                                         method="post"

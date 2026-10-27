@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -22,11 +23,12 @@ class ExampleTest extends TestCase
     }
 
     /**
-     * Test national executive dashboard returns 200 OK.
+     * Test national executive dashboard returns 200 OK for authenticated user.
      */
     public function test_dashboard_renders_successfully(): void
     {
-        $response = $this->get('/dashboard');
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertOk();
     }
