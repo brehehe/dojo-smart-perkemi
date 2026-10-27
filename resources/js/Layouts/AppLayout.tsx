@@ -65,7 +65,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     const isKenshiOnly = isKenshi && !isSuperAdmin && !isPengprovAdmin && !isPengkabAdmin && !isSensei;
     const can = user?.can || {};
 
-    const canViewDirectory = Boolean(can.view_directory ?? (!isKenshiOnly));
+    const isLoggedIn = Boolean(user);
+    const canViewDirectory = Boolean(can.view_directory ?? (isLoggedIn && !isKenshiOnly));
     const canDojoCreate = Boolean(can.dojo_create ?? (isSuperAdmin || isPengprovAdmin));
     const canKenshiCreate = Boolean(can.kenshi_create ?? (isSuperAdmin || isPengprovAdmin || isSensei));
     const canViewReports = Boolean(can.view_reports ?? (isSuperAdmin || isPengprovAdmin || isPengkabAdmin || isSensei || isKenshi));
@@ -73,7 +74,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     const canViewSystemLogs = Boolean(can.view_system_logs ?? isSuperAdmin);
     const canViewMyDojo = Boolean(can.view_my_dojo ?? (isSensei || isSuperAdmin || isPengprovAdmin));
     const canViewKtaPortal = Boolean(can.view_kta_portal ?? (isKenshi || isSuperAdmin));
-    const isLoggedIn = Boolean(user);
 
     const navSections: NavSection[] = [
         {

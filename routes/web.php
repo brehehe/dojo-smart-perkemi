@@ -19,9 +19,6 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-// National Executive Dashboard & Command Center
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
 // Direct /dojo alias route
 Route::get('/dojo', function () {
     if (auth()->check() && auth()->user()->hasRole('Sensei')) {
@@ -39,12 +36,16 @@ Route::middleware('guest')->group(function (): void {
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Publicly viewable directory
-Route::get('/dojos', [DojoController::class, 'index'])->name('dojos.index');
 Route::get('/kenshis', [KenshiController::class, 'index'])->name('kenshis.index');
 Route::get('/coaches', [KenshiController::class, 'coaches'])->name('coaches.index');
 
 // Protected portals & administrative actions
 Route::middleware('auth')->group(function (): void {
+// National Executive Dashboard & Command Center
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Dojo directory & analytics (authenticated members only)
+    Route::get('/dojos', [DojoController::class, 'index'])->name('dojos.index');
     // Dojo Sensei Analytics & Monitoring Portal
     Route::get('/my-dojo', [DojoDashboardController::class, 'index'])->name('dojos.analytics');
 
@@ -78,6 +79,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/dojos/{dojo}/edit', [DojoController::class, 'edit'])->name('dojos.edit');
     Route::put('/dojos/{dojo}', [DojoController::class, 'update'])->name('dojos.update');
     Route::delete('/dojos/{dojo}', [DojoController::class, 'destroy'])->name('dojos.destroy');
+    Route::get('/dojos/{dojo}', [DojoController::class, 'show'])->name('dojos.show');
 
     // Kenshi Administration (registered before wildcards)
     Route::get('/kenshis/export', [KenshiController::class, 'export'])->name('kenshis.export');
@@ -99,12 +101,13 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/attendance/permit', [AttendanceController::class, 'submitPermit'])->name('attendance.permit');
     Route::post('/attendance/{attendance}/approve', [AttendanceController::class, 'approvePermit'])->name('attendance.approve');
     Route::post('/attendance/override-status', [AttendanceController::class, 'overrideStatus'])->name('attendance.override');
+
+
+    // Training Schedules & Calendar (Public / All Members)
+    Route::get('/schedules', [TrainingScheduleController::class, 'index'])->name('schedules.index');
+    Route::get('/schedules/{schedule}', [TrainingScheduleController::class, 'show'])->name('schedules.show');
+
+    // Wildcard parameter detail routes (placed last)
+    Route::get('/kenshis/{kenshi}', [KenshiController::class, 'show'])->name('kenshis.show');
+
 });
-
-// Training Schedules & Calendar (Public / All Members)
-Route::get('/schedules', [TrainingScheduleController::class, 'index'])->name('schedules.index');
-Route::get('/schedules/{schedule}', [TrainingScheduleController::class, 'show'])->name('schedules.show');
-
-// Wildcard parameter detail routes (placed last)
-Route::get('/dojos/{dojo}', [DojoController::class, 'show'])->name('dojos.show');
-Route::get('/kenshis/{kenshi}', [KenshiController::class, 'show'])->name('kenshis.show');

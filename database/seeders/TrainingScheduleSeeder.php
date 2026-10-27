@@ -22,10 +22,9 @@ class TrainingScheduleSeeder extends Seeder
      */
     public function run(): void
     {
-        $senayan = Dojo::where('code', 'DOJO-JKT-001')->first();
-        $ugm = Dojo::where('code', 'DOJO-DIY-001')->first();
+        $surabaya = Dojo::where('code', 'DOJO-SBY-001')->first();
 
-        if (! $senayan || ! $ugm) {
+        if (! $surabaya) {
             return;
         }
 
@@ -33,42 +32,41 @@ class TrainingScheduleSeeder extends Seeder
         $startOfMonth = $now->copy()->startOfMonth();
         $endOfMonth = $now->copy()->endOfMonth();
 
-        // 1. Seed Dojo Senayan: Selasa (Tuesday=2), Kamis (Thursday=4), Sabtu (Saturday=6)
-        $senayanPeriod = CarbonPeriod::create($startOfMonth, $endOfMonth);
-        $senayanKenshis = Kenshi::where('dojo_id', $senayan->id)->get();
+        $surabayaPeriod = CarbonPeriod::create($startOfMonth, $endOfMonth);
+        $surabayaKenshis = Kenshi::where('dojo_id', $surabaya->id)->get();
 
-        foreach ($senayanPeriod as $date) {
+        foreach ($surabayaPeriod as $date) {
             $dayOfWeek = $date->dayOfWeek;
 
-            if ($dayOfWeek === 2 || $dayOfWeek === 4) {
-                // Selasa & Kamis: 19:00 - 21:00
+            if ($dayOfWeek === 1 || $dayOfWeek === 4) {
+                // Senin (1) & Kamis (4): 19:00 - 21:00
                 $schedule = TrainingSchedule::updateOrCreate(
                     [
-                        'dojo_id' => $senayan->id,
+                        'dojo_id' => $surabaya->id,
                         'date' => $date->toDateString(),
                         'start_time' => '19:00',
                     ],
                     [
-                        'title' => 'Latihan Rutin Embu, Randori & Gisei',
+                        'title' => 'Latihan Rutin Embu, Randori & Gisei Surabaya',
                         'program_type' => ScheduleProgramType::Regular,
                         'end_time' => '21:00',
-                        'location_name' => 'Dojo PB Perkemi Senayan (Hall C GBK)',
-                        'latitude' => -6.2185700,
-                        'longitude' => 106.8026100,
+                        'location_name' => 'PERKEMI PENGKOT SURABAYA (Sawahan Tatami Hall)',
+                        'latitude' => -7.3183485,
+                        'longitude' => 112.7177549,
                         'radius_meters' => 150,
-                        'instructor_name' => 'Sensei Budi Prasetyo (V Dan)',
+                        'instructor_name' => 'Sensei Hadi Siswanto (V Dan)',
                         'status' => $date->isPast() ? 'completed' : ($date->isToday() ? 'ongoing' : 'scheduled'),
                     ]
                 );
 
                 if ($date->isPast() || $date->isToday()) {
-                    $this->seedSampleAttendances($schedule, $senayanKenshis);
+                    $this->seedSampleAttendances($schedule, $surabayaKenshis);
                 }
             } elseif ($dayOfWeek === 6) {
-                // Sabtu: 08:00 - 11:00 (Pemusatan UKT & Sabuk Coklat/Dan)
+                // Sabtu (6): 08:00 - 11:00
                 $schedule = TrainingSchedule::updateOrCreate(
                     [
-                        'dojo_id' => $senayan->id,
+                        'dojo_id' => $surabaya->id,
                         'date' => $date->toDateString(),
                         'start_time' => '08:00',
                     ],
@@ -76,86 +74,17 @@ class TrainingScheduleSeeder extends Seeder
                         'title' => 'Pemusatan Teknik & Persiapan Ujian Kenaikan Tingkat (UKT)',
                         'program_type' => ScheduleProgramType::UktPreparation,
                         'end_time' => '11:00',
-                        'location_name' => 'Dojo PB Perkemi Senayan (Hall C GBK)',
-                        'latitude' => -6.2185700,
-                        'longitude' => 106.8026100,
+                        'location_name' => 'PERKEMI PENGKOT SURABAYA (Sawahan Tatami Hall)',
+                        'latitude' => -7.3183485,
+                        'longitude' => 112.7177549,
                         'radius_meters' => 150,
-                        'instructor_name' => 'Sensei Budi Prasetyo (V Dan)',
+                        'instructor_name' => 'Sensei Hadi Siswanto (V Dan)',
                         'status' => $date->isPast() ? 'completed' : ($date->isToday() ? 'ongoing' : 'scheduled'),
                     ]
                 );
 
                 if ($date->isPast() || $date->isToday()) {
-                    $this->seedSampleAttendances($schedule, $senayanKenshis);
-                }
-            }
-        }
-
-        // 2. Seed Dojo UGM: Senin (Monday=1), Rabu (Wednesday=3)
-        $ugmPeriod = CarbonPeriod::create($startOfMonth, $endOfMonth);
-        $ugmKenshis = Kenshi::where('dojo_id', $ugm->id)->get();
-
-        foreach ($ugmPeriod as $date) {
-            $dayOfWeek = $date->dayOfWeek;
-
-            if ($dayOfWeek === 1 || $dayOfWeek === 3) {
-                $schedule = TrainingSchedule::updateOrCreate(
-                    [
-                        'dojo_id' => $ugm->id,
-                        'date' => $date->toDateString(),
-                        'start_time' => '16:30',
-                    ],
-                    [
-                        'title' => 'Latihan Rutin Kihon & Hokei Shorinji Kempo',
-                        'program_type' => ScheduleProgramType::Regular,
-                        'end_time' => '18:30',
-                        'location_name' => 'Gelanggang Mahasiswa Universitas Gadjah Mada',
-                        'latitude' => -7.7712300,
-                        'longitude' => 110.3775000,
-                        'radius_meters' => 150,
-                        'instructor_name' => 'Sensei Agus Santoso (IV Dan)',
-                        'status' => $date->isPast() ? 'completed' : ($date->isToday() ? 'ongoing' : 'scheduled'),
-                    ]
-                );
-
-                if ($date->isPast() || $date->isToday()) {
-                    $this->seedSampleAttendances($schedule, $ugmKenshis);
-                }
-            }
-        }
-
-        // 3. Seed PERKEMI Pengkot Surabaya: Senin (1) & Kamis (4) 19:00 - 21:00
-        $surabaya = Dojo::where('code', 'DOJO-SBY-001')->first();
-        if ($surabaya) {
-            $surabayaKenshis = Kenshi::where('dojo_id', $surabaya->id)->get();
-            $surabayaPeriod = CarbonPeriod::create($startOfMonth, $endOfMonth);
-
-            foreach ($surabayaPeriod as $date) {
-                $dayOfWeek = $date->dayOfWeek;
-
-                if ($dayOfWeek === 1 || $dayOfWeek === 4) {
-                    $schedule = TrainingSchedule::updateOrCreate(
-                        [
-                            'dojo_id' => $surabaya->id,
-                            'date' => $date->toDateString(),
-                            'start_time' => '19:00',
-                        ],
-                        [
-                            'title' => 'Latihan Rutin Shorinji Kempo Surabaya',
-                            'program_type' => ScheduleProgramType::Regular,
-                            'end_time' => '21:00',
-                            'location_name' => 'PERKEMI PENGKOT SURABAYA (Sawahan Tatami Hall)',
-                            'latitude' => -7.3183485,
-                            'longitude' => 112.7177549,
-                            'radius_meters' => 150,
-                            'instructor_name' => 'Sensei Hadi Siswanto (V Dan)',
-                            'status' => $date->isPast() ? 'completed' : ($date->isToday() ? 'ongoing' : 'scheduled'),
-                        ]
-                    );
-
-                    if ($date->isPast() || $date->isToday()) {
-                        $this->seedSampleAttendances($schedule, $surabayaKenshis);
-                    }
+                    $this->seedSampleAttendances($schedule, $surabayaKenshis);
                 }
             }
         }

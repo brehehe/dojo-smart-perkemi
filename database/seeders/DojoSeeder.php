@@ -21,29 +21,7 @@ class DojoSeeder extends Seeder
     {
         $defaultPassword = Hash::make('password123');
 
-        // Sensei 1: Dojo Senayan
-        $senseiSenayan = User::updateOrCreate(
-            ['email' => 'sensei.senayan@perkemi.id'],
-            [
-                'name' => 'Sensei Budi Prasetyo (V Dan)',
-                'password' => $defaultPassword,
-                'email_verified_at' => now(),
-            ]
-        );
-        $senseiSenayan->syncRoles(['Sensei']);
-
-        // Sensei 2: Dojo UGM
-        $senseiUgm = User::updateOrCreate(
-            ['email' => 'sensei.ugm@perkemi.id'],
-            [
-                'name' => 'Sensei Agus Santoso (IV Dan)',
-                'password' => $defaultPassword,
-                'email_verified_at' => now(),
-            ]
-        );
-        $senseiUgm->syncRoles(['Sensei']);
-
-        // Sensei 3: PERKEMI Pengkot Surabaya
+        // Sensei Kepala: PERKEMI Pengkot Surabaya
         $senseiSurabaya = User::updateOrCreate(
             ['email' => 'sensei.surabaya@perkemi.id'],
             [
@@ -54,53 +32,7 @@ class DojoSeeder extends Seeder
         );
         $senseiSurabaya->syncRoles(['Sensei']);
 
-        // Dojo 1: Dojo Senayan PB Perkemi
-        $dojoSenayan = Dojo::updateOrCreate(
-            ['code' => 'DOJO-JKT-001'],
-            [
-                'name' => 'Dojo Senayan PB Perkemi',
-                'pengprov' => 'DKI Jakarta',
-                'pengkab' => 'Jakarta Pusat',
-                'address' => 'Komplek Gelora Bung Karno, Senayan',
-                'city' => 'Jakarta Pusat',
-                'latitude' => -6.2185700,
-                'longitude' => 106.8026100,
-                'head_sensei_id' => $senseiSenayan->id,
-                'contact_phone' => '081299887766',
-                'contact_email' => 'senayan@perkemi.id',
-                'status' => DojoStatus::Active,
-                'metadata' => [
-                    'schedule' => 'Selasa & Kamis (19:00 - 21:00), Sabtu (08:00 - 11:00)',
-                    'tatami_capacity' => 60,
-                    'google_maps_url' => 'https://www.google.com/maps?q=-6.2185700,106.8026100',
-                ],
-            ]
-        );
-
-        // Dojo 2: Dojo Gelanggang UGM
-        $dojoUgm = Dojo::updateOrCreate(
-            ['code' => 'DOJO-DIY-001'],
-            [
-                'name' => 'Dojo Gelanggang UGM',
-                'pengprov' => 'D.I. Yogyakarta',
-                'pengkab' => 'Sleman',
-                'address' => 'Gelanggang Mahasiswa UGM, Jl. Pancasila No. 1',
-                'city' => 'Sleman',
-                'latitude' => -7.7712300,
-                'longitude' => 110.3776200,
-                'head_sensei_id' => $senseiUgm->id,
-                'contact_phone' => '081322334455',
-                'contact_email' => 'ugm@perkemi.id',
-                'status' => DojoStatus::Active,
-                'metadata' => [
-                    'schedule' => 'Senin & Rabu (16:30 - 18:30), Minggu (07:00 - 10:00)',
-                    'tatami_capacity' => 45,
-                    'google_maps_url' => 'https://www.google.com/maps?q=-7.7712300,110.3776200',
-                ],
-            ]
-        );
-
-        // Dojo 3: PERKEMI Pengkot Surabaya
+        // Dojo Tunggal: PERKEMI Pengkot Surabaya
         $dojoSurabaya = Dojo::updateOrCreate(
             ['code' => 'DOJO-SBY-001'],
             [
@@ -125,144 +57,7 @@ class DojoSeeder extends Seeder
             ]
         );
 
-        // Kenshi 1: Arya Suryanegara (I Dan, Dojo Senayan)
-        $userArya = User::updateOrCreate(
-            ['email' => 'arya.kenshi@perkemi.id'],
-            [
-                'name' => 'Arya Suryanegara',
-                'password' => $defaultPassword,
-                'email_verified_at' => now(),
-            ]
-        );
-        $userArya->syncRoles(['Kenshi']);
-
-        Kenshi::updateOrCreate(
-            ['id_card_number' => 'KNS-2026-0001'],
-            [
-                'user_id' => $userArya->id,
-                'dojo_id' => $dojoSenayan->id,
-                'full_name' => 'Arya Suryanegara',
-                'nickname' => 'Arya',
-                'gender' => 'M',
-                'place_of_birth' => 'Jakarta',
-                'date_of_birth' => '2001-05-14',
-                'blood_type' => 'O',
-                'rank' => KenshiRank::Dan1,
-                'phone' => '081234567890',
-                'address' => 'Kebayoran Baru, Jakarta Selatan',
-                'joined_at' => '2019-01-15',
-                'is_active' => true,
-                'metadata' => [
-                    'attendance_rate' => 96,
-                    'total_sessions' => 240,
-                    'last_exam_date' => '2024-08-17',
-                    'ready_for_ukt' => true,
-                ],
-            ]
-        );
-
-        // Kenshi 2: Dewi Anggraini (Kyu I, Dojo Senayan)
-        $userDewi = User::updateOrCreate(
-            ['email' => 'dewi.kenshi@perkemi.id'],
-            [
-                'name' => 'Dewi Anggraini',
-                'password' => $defaultPassword,
-                'email_verified_at' => now(),
-            ]
-        );
-        $userDewi->syncRoles(['Kenshi']);
-
-        Kenshi::updateOrCreate(
-            ['id_card_number' => 'KNS-2026-0002'],
-            [
-                'user_id' => $userDewi->id,
-                'dojo_id' => $dojoSenayan->id,
-                'full_name' => 'Dewi Anggraini',
-                'nickname' => 'Dewi',
-                'gender' => 'F',
-                'place_of_birth' => 'Bandung',
-                'date_of_birth' => '2003-09-22',
-                'blood_type' => 'A',
-                'rank' => KenshiRank::Kyu1,
-                'phone' => '081298765432',
-                'address' => 'Tebet, Jakarta Selatan',
-                'joined_at' => '2021-03-10',
-                'is_active' => true,
-                'metadata' => [
-                    'attendance_rate' => 92,
-                    'total_sessions' => 180,
-                    'last_exam_date' => '2025-02-10',
-                    'ready_for_ukt' => true,
-                ],
-            ]
-        );
-
-        // Kenshi 3: Fajar Wicaksono (Kyu II, Dojo UGM)
-        $userFajar = User::updateOrCreate(
-            ['email' => 'fajar.kenshi@perkemi.id'],
-            [
-                'name' => 'Fajar Wicaksono',
-                'password' => $defaultPassword,
-                'email_verified_at' => now(),
-            ]
-        );
-        $userFajar->syncRoles(['Kenshi']);
-
-        Kenshi::updateOrCreate(
-            ['id_card_number' => 'KNS-2026-0003'],
-            [
-                'user_id' => $userFajar->id,
-                'dojo_id' => $dojoUgm->id,
-                'full_name' => 'Fajar Wicaksono',
-                'nickname' => 'Fajar',
-                'gender' => 'M',
-                'place_of_birth' => 'Yogyakarta',
-                'date_of_birth' => '2004-11-08',
-                'blood_type' => 'B',
-                'rank' => KenshiRank::Kyu2,
-                'phone' => '087711223344',
-                'address' => 'Kaliurang KM 5, Sleman',
-                'joined_at' => '2022-08-01',
-                'is_active' => true,
-                'metadata' => [
-                    'attendance_rate' => 88,
-                    'total_sessions' => 140,
-                    'last_exam_date' => '2025-06-20',
-                    'ready_for_ukt' => false,
-                ],
-            ]
-        );
-
-        // Add additional kenshis for Dojo Senayan to enrich the analytics
-        $additionalSenayan = [
-            ['KNS-2026-0004', 'Rizky Pratama', 'Rizky', 'M', KenshiRank::Dan2, true, '2017-04-10', 98],
-            ['KNS-2026-0005', 'Siti Rahmawati', 'Rahma', 'F', KenshiRank::Kyu3, true, '2023-01-12', 85],
-            ['KNS-2026-0006', 'Bambang Sudiro', 'Bambang', 'M', KenshiRank::Kyu5, true, '2023-09-05', 82],
-            ['KNS-2026-0007', 'Gita Permata', 'Gita', 'F', KenshiRank::Minarai, true, '2026-01-15', 90],
-            ['KNS-2026-0008', 'Hendro Wijaya', 'Hendro', 'M', KenshiRank::Kyu4, false, '2022-03-20', 45],
-        ];
-
-        foreach ($additionalSenayan as [$idCard, $name, $nick, $gender, $rank, $isActive, $joinedAt, $attRate]) {
-            Kenshi::updateOrCreate(
-                ['id_card_number' => $idCard],
-                [
-                    'dojo_id' => $dojoSenayan->id,
-                    'full_name' => $name,
-                    'nickname' => $nick,
-                    'gender' => $gender,
-                    'rank' => $rank,
-                    'member_type' => $rank->isDan() ? 'coach' : 'athlete',
-                    'is_active' => $isActive,
-                    'joined_at' => $joinedAt,
-                    'metadata' => [
-                        'attendance_rate' => $attRate,
-                        'total_sessions' => rand(30, 200),
-                    ],
-                ]
-            );
-        }
-
-        // Surabaya Pelatih (Sensei / Coach)
+        // Pelatih Dojo Surabaya (Sensei / Coach)
         $pelatihSurabaya = User::updateOrCreate(
             ['email' => 'pelatih.surabaya@perkemi.id'],
             [
@@ -299,20 +94,25 @@ class DojoSeeder extends Seeder
             ]
         );
 
-        // Surabaya Atlet / Kenshi (Default password = NIK)
+        // Kenshi / Atlet Dojo Surabaya
         $surabayaKenshis = [
-            ['KNS-SBY-001', 'Bayu Pratama Wijaya', 'Bayu', 'M', KenshiRank::Dan1, 'athlete', '081345678001', 'Sawahan, Kota Surabaya'],
-            ['KNS-SBY-002', 'Siti Nurhaliza Putri', 'Liza', 'F', KenshiRank::Kyu1, 'athlete', '081345678002', 'Wonokromo, Kota Surabaya'],
-            ['KNS-SBY-003', 'Ahmad Farhan', 'Farhan', 'M', KenshiRank::Kyu2, 'athlete', '081345678003', 'Tegalsari, Kota Surabaya'],
-            ['KNS-SBY-004', 'Dinda Ayu Maharani', 'Dinda', 'F', KenshiRank::Kyu3, 'athlete', '081345678004', 'Gubeng, Kota Surabaya'],
+            ['KNS-SBY-001', 'Bayu Pratama Wijaya', 'Bayu', 'M', KenshiRank::Dan1, 'athlete', '081345678001', 'Sawahan, Kota Surabaya', '2019-02-10', 96, 240, true],
+            ['KNS-SBY-002', 'Siti Nurhaliza Putri', 'Liza', 'F', KenshiRank::Kyu1, 'athlete', '081345678002', 'Wonokromo, Kota Surabaya', '2021-04-15', 92, 180, true],
+            ['KNS-SBY-003', 'Ahmad Farhan', 'Farhan', 'M', KenshiRank::Kyu2, 'athlete', '081345678003', 'Tegalsari, Kota Surabaya', '2022-06-20', 88, 140, false],
+            ['KNS-SBY-004', 'Dinda Ayu Maharani', 'Dinda', 'F', KenshiRank::Kyu3, 'athlete', '081345678004', 'Gubeng, Kota Surabaya', '2022-11-05', 85, 110, false],
+            ['KNS-SBY-005', 'Rizky Maulana', 'Rizky', 'M', KenshiRank::Kyu4, 'athlete', '081345678005', 'Kenjeran, Kota Surabaya', '2023-03-12', 90, 85, false],
+            ['KNS-SBY-006', 'Anisa Rahmadani', 'Anisa', 'F', KenshiRank::Kyu5, 'athlete', '081345678006', 'Sukolilo, Kota Surabaya', '2023-08-18', 82, 60, false],
+            ['KNS-SBY-007', 'Budi Santoso', 'Budi', 'M', KenshiRank::Minarai, 'athlete', '081345678007', 'Tambaksari, Kota Surabaya', '2024-01-10', 95, 30, false],
+            ['KNS-SBY-008', 'Tri Wahyudi', 'Yudi', 'M', KenshiRank::Dan2, 'athlete', '081345678008', 'Mulyorejo, Kota Surabaya', '2017-09-01', 98, 310, true],
         ];
 
-        foreach ($surabayaKenshis as [$idCard, $name, $nick, $gender, $rank, $mType, $phone, $address]) {
+        foreach ($surabayaKenshis as [$idCard, $name, $nick, $gender, $rank, $mType, $phone, $address, $joinedAt, $attRate, $sessions, $readyUkt]) {
+            $userEmail = strtolower(str_replace('-', '', $idCard)).'@kenshi.perkemi.id';
             $kenshiUser = User::updateOrCreate(
-                ['email' => strtolower(str_replace('-', '', $idCard)).'@kenshi.perkemi.id'],
+                ['email' => $userEmail],
                 [
                     'name' => $name,
-                    'password' => Hash::make($idCard), // Password default NIK
+                    'password' => $defaultPassword,
                     'email_verified_at' => now(),
                 ]
             );
@@ -330,11 +130,12 @@ class DojoSeeder extends Seeder
                     'member_type' => $mType,
                     'phone' => $phone,
                     'address' => $address,
+                    'joined_at' => $joinedAt,
                     'is_active' => true,
-                    'joined_at' => '2023-01-10',
                     'metadata' => [
-                        'attendance_rate' => rand(85, 98),
-                        'total_sessions' => rand(60, 210),
+                        'attendance_rate' => $attRate,
+                        'total_sessions' => $sessions,
+                        'ready_for_ukt' => $readyUkt,
                     ],
                 ]
             );

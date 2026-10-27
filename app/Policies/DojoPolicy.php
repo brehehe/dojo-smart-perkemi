@@ -22,19 +22,19 @@ class DojoPolicy
     }
 
     /**
-     * Publicly viewable directory of dojos.
+     * Viewable directory of dojos for authenticated users.
      */
     public function viewAny(?User $user): bool
     {
-        return true;
+        return $user !== null;
     }
 
     /**
-     * Publicly viewable dojo detail.
+     * Viewable dojo detail for authenticated users.
      */
     public function view(?User $user, Dojo $dojo): bool
     {
-        return true;
+        return $user !== null;
     }
 
     public function create(User $user): bool

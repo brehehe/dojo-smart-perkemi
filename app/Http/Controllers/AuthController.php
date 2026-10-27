@@ -26,32 +26,10 @@ class AuthController extends Controller
     }
 
     /**
-     * Process authentication with support for multi-role quick demo login.
+     * Process authentication with credentials.
      */
     public function login(Request $request): RedirectResponse
     {
-        // Multi-role demo login switch
-        if ($request->filled('demo_role')) {
-            $roleEmailMap = [
-                'superadmin' => 'admin@perkemi.id',
-                'sensei_senayan' => 'sensei.senayan@perkemi.id',
-                'sensei_ugm' => 'sensei.ugm@perkemi.id',
-                'kenshi_arya' => 'arya.kenshi@perkemi.id',
-                'kenshi_dewi' => 'dewi.kenshi@perkemi.id',
-            ];
-
-            $email = $roleEmailMap[$request->string('demo_role')->toString()] ?? 'admin@perkemi.id';
-            $user = User::where('email', $email)->first();
-
-            if ($user) {
-                Auth::login($user);
-                $request->session()->regenerate();
-
-                return $this->redirectByRole($user)
-                    ->with('success', "Masuk sebagai {$user->name}.");
-            }
-        }
-
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
@@ -80,7 +58,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('dojos.index')
+        return redirect()->route('login')
             ->with('info', 'Anda telah keluar dari sistem.');
     }
 

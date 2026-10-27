@@ -32,6 +32,13 @@ class DojoManagementTest extends TestCase
         $response->assertInertia(fn ($page) => $page->component('Dojos/Index'));
     }
 
+    public function test_guest_cannot_view_dojos_index_page(): void
+    {
+        $response = $this->get('/dojos');
+
+        $response->assertRedirect('/login');
+    }
+
     public function test_can_create_a_new_dojo(): void
     {
         $admin = User::factory()->create();
