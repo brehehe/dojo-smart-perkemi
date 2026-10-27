@@ -87,4 +87,64 @@ class DojoManagementTest extends TestCase
         $response->assertRedirect('/dojos');
         $this->assertSoftDeleted('dojos', ['id' => $dojo->id]);
     }
+
+    public function test_can_create_dojo_with_coordinates_and_radius(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('SuperAdmin');
+
+        $response = $this->actingAs($admin)->post('/dojos', [
+            'code' => 'DOJO-SBY-GPS',
+            'name' => 'Dojo Surabaya Geofence',
+            'pengprov' => 'Jawa Timur',
+            'pengkab' => 'Kota Surabaya',
+            'latitude' => -7.318348,
+            'longitude' => 112.717755,
+            'radius_meters' => 200,
+            'status' => 'active',
+        ]);
+
+        $response->assertRedirect('/dojos');
+        $this->assertDatabaseHas('dojos', [
+            'code' => 'DOJO-SBY-GPS',
+            'latitude' => -7.318348,
+            'longitude' => 112.717755,
+            'radius_meters' => 200,
+        ]);
+    }
+
+    public function test_can_update_dojo_coordinates_and_radius(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('SuperAdmin');
+
+        $dojo = Dojo::create([
+            'code' => 'DOJO-UP-01',
+            'name' => 'Dojo Awal',
+            'pengprov' => 'Jawa Timur',
+            'pengkab' => 'Kota Surabaya',
+            'status' => 'active',
+            'radius_meters' => 100,
+        ]);
+
+        $response = $this->actingAs($admin)->put("/dojos/{$dojo->id}", [
+            'code' => 'DOJO-UP-01',
+            'name' => 'Dojo Awal Diperbarui',
+            'pengprov' => 'Jawa Timur',
+            'pengkab' => 'Kota Surabaya',
+            'latitude' => -7.250445,
+            'longitude' => 112.768845,
+            'radius_meters' => 250,
+            'status' => 'active',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('dojos', [
+            'id' => $dojo->id,
+            'name' => 'Dojo Awal Diperbarui',
+            'latitude' => -7.250445,
+            'longitude' => 112.768845,
+            'radius_meters' => 250,
+        ]);
+    }
 }

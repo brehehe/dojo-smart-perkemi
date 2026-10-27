@@ -25,6 +25,10 @@ export interface Dojo {
     pengkab: string;
     address?: string | null;
     city?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    radius_meters?: number;
+    maps_url?: string | null;
     head_sensei?: {
         id: string;
         name: string;
@@ -58,6 +62,24 @@ export interface Kenshi {
         is_dan: boolean;
     };
     member_type?: 'athlete' | 'coach';
+    is_atlet_pengkot?: boolean;
+    is_atlet_pengprov?: boolean;
+    pengkot_id?: string | null;
+    pengprov_id?: string | null;
+    pengkot?: string | null;
+    pengprov?: string | null;
+    pengkot_org?: {
+        id: string;
+        name: string;
+        code: string;
+        region: string;
+    } | null;
+    pengprov_org?: {
+        id: string;
+        name: string;
+        code: string;
+        region: string;
+    } | null;
     phone?: string | null;
     address?: string | null;
     is_active: boolean;
@@ -68,6 +90,32 @@ export interface Kenshi {
         code: string;
         pengprov: string;
     } | null;
+    created_at?: string;
+}
+
+export interface PengurusOrg {
+    id: string;
+    type: 'pengkot' | 'pengprov';
+    name: string;
+    code: string;
+    region: string;
+    user_id?: string | null;
+    user?: {
+        id: string;
+        name: string;
+        email: string;
+    } | null;
+    sk_number?: string | null;
+    sk_period?: string | null;
+    leader_name?: string | null;
+    secretary_name?: string | null;
+    contact_phone?: string | null;
+    contact_email?: string | null;
+    address?: string | null;
+    status: string;
+    metadata?: Record<string, any> | null;
+    dojos_count?: number;
+    athletes_count?: number;
     created_at?: string;
 }
 

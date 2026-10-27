@@ -30,6 +30,7 @@ class DojoResource extends JsonResource
             'city' => $this->city,
             'latitude' => $this->latitude ?? $this->metadata['latitude'] ?? null,
             'longitude' => $this->longitude ?? $this->metadata['longitude'] ?? null,
+            'radius_meters' => $this->radius_meters ?? 150,
             'maps_url' => $this->metadata['google_maps_url'] ?? ($this->latitude ? "https://www.google.com/maps?q={$this->latitude},{$this->longitude}" : null),
             'head_sensei' => $this->whenLoaded('headSensei', fn () => $this->headSensei ? [
                 'id' => $this->headSensei->id,

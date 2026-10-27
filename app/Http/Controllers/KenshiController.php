@@ -13,6 +13,7 @@ use App\Http\Resources\DojoResource;
 use App\Http\Resources\KenshiResource;
 use App\Models\Dojo;
 use App\Models\Kenshi;
+use App\Models\Pengurus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -260,6 +261,8 @@ class KenshiController extends Controller
         $this->authorize('create', Kenshi::class);
 
         $dojos = Dojo::active()->select('id', 'name', 'code', 'pengprov', 'status')->get();
+        $pengkots = Pengurus::pengkot()->active()->orderBy('name')->get(['id', 'name', 'code', 'region']);
+        $pengprovs = Pengurus::pengprov()->active()->orderBy('name')->get(['id', 'name', 'code', 'region']);
 
         return Inertia::render('Kenshis/Create', [
             'dojos' => DojoResource::collection($dojos),
@@ -267,6 +270,8 @@ class KenshiController extends Controller
                 'value' => $r->value,
                 'label' => $r->label(),
             ]),
+            'pengkots' => $pengkots,
+            'pengprovs' => $pengprovs,
         ]);
     }
 
@@ -287,7 +292,7 @@ class KenshiController extends Controller
     {
         $this->authorize('view', $kenshi);
 
-        $kenshi->load(['dojo', 'user']);
+        $kenshi->load(['dojo', 'user', 'pengkotOrg', 'pengprovOrg']);
 
         return Inertia::render('Kenshis/Show', [
             'kenshi' => new KenshiResource($kenshi),
@@ -302,6 +307,8 @@ class KenshiController extends Controller
         $this->authorize('update', $kenshi);
 
         $dojos = Dojo::active()->select('id', 'name', 'code', 'pengprov', 'status')->get();
+        $pengkots = Pengurus::pengkot()->active()->orderBy('name')->get(['id', 'name', 'code', 'region']);
+        $pengprovs = Pengurus::pengprov()->active()->orderBy('name')->get(['id', 'name', 'code', 'region']);
 
         return Inertia::render('Kenshis/Edit', [
             'kenshi' => new KenshiResource($kenshi),
@@ -310,6 +317,8 @@ class KenshiController extends Controller
                 'value' => $r->value,
                 'label' => $r->label(),
             ]),
+            'pengkots' => $pengkots,
+            'pengprovs' => $pengprovs,
         ]);
     }
 

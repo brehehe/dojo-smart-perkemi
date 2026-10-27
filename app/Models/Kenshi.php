@@ -34,6 +34,12 @@ class Kenshi extends Model
         'blood_type',
         'rank',
         'member_type',
+        'is_atlet_pengkot',
+        'pengkot_id',
+        'is_atlet_pengprov',
+        'pengprov_id',
+        'pengkot',
+        'pengprov',
         'phone',
         'address',
         'joined_at',
@@ -45,6 +51,8 @@ class Kenshi extends Model
     {
         return [
             'rank' => KenshiRank::class,
+            'is_atlet_pengkot' => 'boolean',
+            'is_atlet_pengprov' => 'boolean',
             'date_of_birth' => 'date',
             'joined_at' => 'date',
             'is_active' => 'boolean',
@@ -97,6 +105,22 @@ class Kenshi extends Model
     public function dojo(): BelongsTo
     {
         return $this->belongsTo(Dojo::class);
+    }
+
+    /**
+     * The Pengkot organization this athlete represents.
+     */
+    public function pengkotOrg(): BelongsTo
+    {
+        return $this->belongsTo(Pengurus::class, 'pengkot_id');
+    }
+
+    /**
+     * The Pengprov organization this athlete represents.
+     */
+    public function pengprovOrg(): BelongsTo
+    {
+        return $this->belongsTo(Pengurus::class, 'pengprov_id');
     }
 
     /**

@@ -28,6 +28,7 @@ class Dojo extends Model
         'city',
         'latitude',
         'longitude',
+        'radius_meters',
         'head_sensei_id',
         'contact_phone',
         'contact_email',
@@ -41,6 +42,7 @@ class Dojo extends Model
             'status' => DojoStatus::class,
             'latitude' => 'float',
             'longitude' => 'float',
+            'radius_meters' => 'integer',
             'metadata' => 'array',
         ];
     }

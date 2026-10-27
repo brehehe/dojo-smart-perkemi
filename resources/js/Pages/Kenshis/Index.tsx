@@ -282,12 +282,24 @@ export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle
                                             </span>
                                         </TableCell>
                                         <TableCell>
-                                            <Badge
-                                                variant={kenshi.member_type === 'coach' ? 'amber' : 'slate'}
-                                                className="text-[11px]"
-                                            >
-                                                {kenshi.member_type === 'coach' ? 'Pelatih' : 'Atlet'}
-                                            </Badge>
+                                            <div className="flex flex-col gap-1 items-start">
+                                                <Badge
+                                                    variant={kenshi.member_type === 'coach' ? 'amber' : 'slate'}
+                                                    className="text-[11px]"
+                                                >
+                                                    {kenshi.member_type === 'coach' ? 'Pelatih' : 'Atlet'}
+                                                </Badge>
+                                                {kenshi.is_atlet_pengkot && (
+                                                    <span className="inline-flex items-center gap-1 rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-bold text-rose-700 border border-rose-200">
+                                                        Pengkot {kenshi.pengkot ? `(${kenshi.pengkot})` : ''}
+                                                    </span>
+                                                )}
+                                                {kenshi.is_atlet_pengprov && (
+                                                    <span className="inline-flex items-center gap-1 rounded bg-purple-50 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200">
+                                                        Pengprov {kenshi.pengprov ? `(${kenshi.pengprov})` : ''}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="text-xs">

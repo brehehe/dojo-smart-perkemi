@@ -29,6 +29,7 @@ import {
     User,
     VideoOff,
 } from 'lucide-react';
+import { DojoMapViewer } from '@/Components/Map/DojoMapViewer';
 
 interface Props {
     schedule: { data: TrainingSchedule } | TrainingSchedule | null;
@@ -803,31 +804,15 @@ export default function AttendanceCheckIn({
 
                                 {/* Interactive Visual Map Embed */}
                                 {tatamiLat && tatamiLng && (
-                                    <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 h-44 shadow-2xs">
-                                        <iframe
-                                            title="Peta Lokasi Tatami"
-                                            width="100%"
-                                            height="100%"
-                                            frameBorder="0"
-                                            scrolling="no"
-                                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(tatamiLng) - 0.005}%2C${Number(tatamiLat) - 0.003}%2C${Number(tatamiLng) + 0.005}%2C${Number(tatamiLat) + 0.003}&layer=mapnik&marker=${tatamiLat}%2C${tatamiLng}`}
-                                            className="w-full h-full"
+                                    <div className="rounded-xl overflow-hidden shadow-2xs">
+                                        <DojoMapViewer
+                                            latitude={Number(tatamiLat)}
+                                            longitude={Number(tatamiLng)}
+                                            radiusMeters={tatamiRadius}
+                                            dojoName={tatamiLocationName}
+                                            address={tatamiAddress || undefined}
+                                            height="260px"
                                         />
-                                        <div className="absolute top-2 left-2 bg-slate-900/85 backdrop-blur-xs text-white px-2.5 py-1 rounded-md text-[10px] font-semibold flex items-center gap-1 shadow-sm">
-                                            <MapPin className="w-3 h-3 text-red-400" />
-                                            <span className="truncate max-w-[200px]">{tatamiLocationName}</span>
-                                        </div>
-                                        {googleMapsTatamiUrl && (
-                                            <a
-                                                href={googleMapsTatamiUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="absolute bottom-2 right-2 bg-white/95 hover:bg-white text-slate-800 px-2.5 py-1 rounded-md text-[10px] font-bold shadow-xs border border-slate-200 flex items-center gap-1 transition-colors"
-                                            >
-                                                <ExternalLink className="w-3 h-3 text-blue-600" />
-                                                <span>Buka di Google Maps</span>
-                                            </a>
-                                        )}
                                     </div>
                                 )}
 

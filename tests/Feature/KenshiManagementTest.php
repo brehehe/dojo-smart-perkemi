@@ -119,4 +119,76 @@ class KenshiManagementTest extends TestCase
             ->has('kenshi')
         );
     }
+
+    public function test_can_create_kenshi_with_pengkot_and_pengprov_athlete_status(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('SuperAdmin');
+
+        $dojo = Dojo::create([
+            'code' => 'DOJO-SBY-ATLET',
+            'name' => 'Dojo Atlet Surabaya',
+            'pengprov' => 'Jawa Timur',
+            'pengkab' => 'Kota Surabaya',
+            'status' => DojoStatus::Active,
+        ]);
+
+        $response = $this->actingAs($admin)->post('/kenshis', [
+            'id_card_number' => 'KNS-ATLET-01',
+            'dojo_id' => $dojo->id,
+            'full_name' => 'Aditya Pratama',
+            'gender' => 'M',
+            'rank' => 'kyu_1',
+            'member_type' => 'athlete',
+            'is_atlet_pengkot' => true,
+            'pengkot' => 'Kota Surabaya',
+            'is_atlet_pengprov' => true,
+            'pengprov' => 'Jawa Timur',
+            'create_user_account' => false,
+        ]);
+
+        $response->assertRedirect('/kenshis');
+        $this->assertDatabaseHas('kenshis', [
+            'id_card_number' => 'KNS-ATLET-01',
+            'full_name' => 'Aditya Pratama',
+            'is_atlet_pengkot' => true,
+            'pengkot' => 'Kota Surabaya',
+            'is_atlet_pengprov' => true,
+            'pengprov' => 'Jawa Timur',
+        ]);
+    }
+
+    public function test_can_register_new_kenshi_with_athlete_options(): void
+    {
+        Role::findOrCreate('Kenshi', 'web');
+
+        $dojo = Dojo::create([
+            'code' => 'DOJO-REGIS-01',
+            'name' => 'Dojo Pendaftaran',
+            'pengprov' => 'Jawa Timur',
+            'pengkab' => 'Kota Surabaya',
+            'status' => DojoStatus::Active,
+        ]);
+
+        $response = $this->post('/register', [
+            'full_name' => 'Bintang Perkemi',
+            'dojo_id' => $dojo->id,
+            'gender' => 'M',
+            'rank' => 'minarai',
+            'is_atlet_pengkot' => true,
+            'pengkot' => 'Kota Surabaya',
+            'is_atlet_pengprov' => false,
+            'email' => 'bintang@perkemi.id',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertRedirect(route('kenshis.portal'));
+        $this->assertDatabaseHas('users', ['email' => 'bintang@perkemi.id']);
+        $this->assertDatabaseHas('kenshis', [
+            'full_name' => 'Bintang Perkemi',
+            'is_atlet_pengkot' => true,
+            'pengkot' => 'Kota Surabaya',
+        ]);
+    }
 }

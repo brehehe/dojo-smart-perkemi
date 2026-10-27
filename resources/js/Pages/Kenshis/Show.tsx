@@ -9,6 +9,7 @@ import { Badge } from '@/Components/UI/Elements/Badge';
 import { Button } from '@/Components/UI/Elements/Button';
 import { Avatar } from '@/Components/UI/Elements/Avatar';
 import { RankBadge } from '@/Components/UI/DataDisplay/RankBadge';
+import { KenshiCard3D } from '@/Components/UI/DataDisplay/KenshiCard3D';
 import {
     ArrowLeft,
     Award,
@@ -20,7 +21,10 @@ import {
     Mail,
     MapPin,
     Phone,
+    QrCode,
     Shield,
+    Sparkles,
+    Trophy,
     UserCheck,
 } from 'lucide-react';
 
@@ -69,22 +73,22 @@ export default function KenshisShow({ kenshi: rawKenshi }: Props) {
                         )}
                         <Link href="/portal/kenshi">
                             <Button variant="primary" leftIcon={<Award className="w-4 h-4" />}>
-                                KTA Digital 3D
+                                Portal Kenshi
                             </Button>
                         </Link>
                     </div>
                 }
             />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Main Profile Info Card */}
-                <div className="lg:col-span-2 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                {/* Main Profile Info Card (Left Column) */}
+                <div className="lg:col-span-7 space-y-6">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <Avatar name={kenshi.full_name} size="lg" />
                                 <div>
-                                    <CardTitle className="text-base font-bold text-slate-900">
+                                    <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-100">
                                         {kenshi.full_name}
                                     </CardTitle>
                                     <p className="text-xs text-slate-500 font-mono">
@@ -105,81 +109,107 @@ export default function KenshisShow({ kenshi: rawKenshi }: Props) {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70">
+                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
                                     <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
                                         Nama Panggilan
                                     </span>
-                                    <span className="text-xs font-bold text-slate-800">
+                                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                         {kenshi.nickname || '-'}
                                     </span>
                                 </div>
 
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70">
+                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
                                     <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
                                         Jenis Kelamin
                                     </span>
-                                    <span className="text-xs font-bold text-slate-800">
+                                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                         {kenshi.gender === 'M' ? 'Laki-Laki' : 'Perempuan'}
                                     </span>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70">
+                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
                                     <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
                                         Tempat, Tanggal Lahir
                                     </span>
-                                    <span className="text-xs font-bold text-slate-800">
+                                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                         {kenshi.place_of_birth || '-'}
                                         {kenshi.date_of_birth ? `, ${formatDate(kenshi.date_of_birth)}` : ''}
                                     </span>
                                 </div>
 
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70">
+                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
                                     <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
                                         Golongan Darah
                                     </span>
                                     <div className="flex items-center gap-1.5 mt-0.5">
                                         <HeartPulse className="w-3.5 h-3.5 text-rose-500" />
-                                        <span className="text-xs font-bold text-slate-800">
+                                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                             {kenshi.blood_type || '-'}
                                         </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70">
+                            {/* Afiliasi Atlet Prestasi (Pengkot / Pengprov) */}
+                            <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
+                                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1.5">
+                                    Status Atlet Berprestasi Perkemi
+                                </span>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {kenshi.is_atlet_pengkot && (
+                                        <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900/60">
+                                            <Sparkles className="h-3.5 w-3.5 text-rose-500" />
+                                            Atlet Pengkot {kenshi.pengkot ? `(${kenshi.pengkot})` : ''}
+                                        </span>
+                                    )}
+                                    {kenshi.is_atlet_pengprov && (
+                                        <span className="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900/60">
+                                            <Trophy className="h-3.5 w-3.5 text-purple-500" />
+                                            Atlet Pengprov {kenshi.pengprov ? `(${kenshi.pengprov})` : ''}
+                                        </span>
+                                    )}
+                                    {!kenshi.is_atlet_pengkot && !kenshi.is_atlet_pengprov && (
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                                            Kenshi Reguler Cabang Dojo
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
                                 <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
                                     Alamat Domisili
                                 </span>
                                 <div className="flex items-start gap-2 mt-1">
                                     <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                                    <p className="text-xs text-slate-700 leading-relaxed">
+                                    <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                                         {kenshi.address || 'Alamat domisili belum dilengkapi.'}
                                     </p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70">
+                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
                                     <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
                                         Nomor Telepon / WhatsApp
                                     </span>
                                     <div className="flex items-center gap-2 mt-1">
                                         <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                                        <span className="text-xs font-medium text-slate-800">
+                                        <span className="text-xs font-medium text-slate-800 dark:text-slate-200">
                                             {kenshi.phone || '-'}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70">
+                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
                                     <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
                                         Tanggal Bergabung
                                     </span>
                                     <div className="flex items-center gap-2 mt-1">
                                         <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-                                        <span className="text-xs font-medium text-slate-800">
+                                        <span className="text-xs font-medium text-slate-800 dark:text-slate-200">
                                             {kenshi.joined_at ? formatDate(kenshi.joined_at) : '-'}
                                         </span>
                                     </div>
@@ -187,33 +217,33 @@ export default function KenshisShow({ kenshi: rawKenshi }: Props) {
                             </div>
                         </CardContent>
                     </Card>
-                </div>
 
-                {/* Sidebar Afiliasi Dojo */}
-                <div className="space-y-6">
+                    {/* Dojo Affiliation Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                                 <Shield className="w-4 h-4 text-red-600" />
-                                Pangkalan Dojo
+                                Cabang Latihan (Dojo)
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-3">
+                        <CardContent>
                             {kenshi.dojo ? (
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/80">
-                                    <p className="text-sm font-bold text-slate-900">
-                                        {kenshi.dojo.name}
-                                    </p>
-                                    <p className="text-xs font-mono text-slate-500 mt-0.5">
-                                        {kenshi.dojo.code}
-                                    </p>
-                                    <p className="text-xs text-slate-600 mt-1">
-                                        {kenshi.dojo.pengprov}
-                                    </p>
-                                    <div className="mt-3">
+                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/60">
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                                                {kenshi.dojo.name}
+                                            </p>
+                                            <p className="text-xs font-mono text-slate-500 mt-0.5">
+                                                {kenshi.dojo.code}
+                                            </p>
+                                            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                                                {kenshi.dojo.pengprov} {kenshi.dojo.pengkab ? `• ${kenshi.dojo.pengkab}` : ''}
+                                            </p>
+                                        </div>
                                         <Link href={`/dojos/${kenshi.dojo.id}`}>
-                                            <Button variant="secondary" size="sm" className="w-full">
-                                                Lihat Profil Dojo
+                                            <Button variant="outline" size="sm">
+                                                Profil Dojo
                                             </Button>
                                         </Link>
                                     </div>
@@ -225,24 +255,24 @@ export default function KenshisShow({ kenshi: rawKenshi }: Props) {
                             )}
                         </CardContent>
                     </Card>
+                </div>
 
+                {/* 3D Interactive KTA Card & QR Code (Right Column) */}
+                <div className="lg:col-span-5 space-y-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                                <Award className="w-4 h-4 text-amber-500" />
-                                Lisensi & Evaluasi UKT
-                            </CardTitle>
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                                    <QrCode className="w-4 h-4 text-amber-500" />
+                                    KTA Digital 3D & Verifikasi QR
+                                </CardTitle>
+                                <span className="text-[10px] font-mono text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-bold dark:bg-amber-950/60 dark:text-amber-400">
+                                    INTERAKTIF
+                                </span>
+                            </div>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-xs text-slate-600 leading-relaxed mb-3">
-                                Kenshi dapat membuka Kartu Tanda Anggota (KTA) Digital 3D berstandar PB Perkemi
-                                lengkap dengan roadmap kenaikan tingkat.
-                            </p>
-                            <Link href="/portal/kenshi" className="block">
-                                <Button variant="primary" size="sm" className="w-full">
-                                    Buka KTA Digital & Roadmap
-                                </Button>
-                            </Link>
+                        <CardContent className="pt-2">
+                            <KenshiCard3D kenshi={kenshi} />
                         </CardContent>
                     </Card>
                 </div>

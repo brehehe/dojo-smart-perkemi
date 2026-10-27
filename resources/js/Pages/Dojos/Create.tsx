@@ -7,7 +7,8 @@ import { Input } from '@/Components/UI/Forms/Input';
 import { Select } from '@/Components/UI/Forms/Select';
 import { Textarea } from '@/Components/UI/Forms/Textarea';
 import { Button } from '@/Components/UI/Elements/Button';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, MapPin, Save } from 'lucide-react';
+import { DojoMapPicker } from '@/Components/Map/DojoMapPicker';
 
 export default function DojosCreate() {
     const { data, setData, post, processing, errors } = useForm({
@@ -20,6 +21,9 @@ export default function DojosCreate() {
         contact_phone: '',
         contact_email: '',
         status: 'active',
+        latitude: -7.3183485 as number | null,
+        longitude: 112.7177549 as number | null,
+        radius_meters: 150,
     });
 
     const submit = (e: React.FormEvent) => {
@@ -33,7 +37,7 @@ export default function DojosCreate() {
 
             <PageHeading
                 title="Pendaftaran Dojo Baru"
-                description="Lengkapi data cabang latihan dojo untuk diakui dalam pangkalan data nasional Perkemi."
+                description="Lengkapi data cabang latihan dojo untuk diakui dalam pangkalan data nasional Perkemi beserta titik geolokasi & radius absensi."
                 actions={
                     <Link href="/dojos">
                         <Button variant="secondary" leftIcon={<ArrowLeft className="w-4 h-4" />}>
@@ -43,8 +47,8 @@ export default function DojosCreate() {
                 }
             />
 
-            <div className="max-w-3xl">
-                <form onSubmit={submit}>
+            <div className="max-w-4xl">
+                <form onSubmit={submit} className="space-y-6">
                     <Card>
                         <CardHeader>
                             <CardTitle>Informasi Cabang Dojo</CardTitle>
@@ -54,7 +58,7 @@ export default function DojosCreate() {
                                 <Input
                                     label="Kode Dojo"
                                     required
-                                    placeholder="Contoh: DOJO-BDG-002"
+                                    placeholder="Contoh: DOJO-SBY-001"
                                     value={data.code}
                                     onChange={(e) => setData('code', e.target.value)}
                                     error={errors.code}
@@ -63,7 +67,7 @@ export default function DojosCreate() {
                                 <Input
                                     label="Nama Dojo"
                                     required
-                                    placeholder="Contoh: Dojo Ganesha ITB"
+                                    placeholder="Contoh: Dojo Gelora Pancasila Surabaya"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                     error={errors.name}
@@ -74,7 +78,7 @@ export default function DojosCreate() {
                                 <Input
                                     label="Pengprov Perkemi"
                                     required
-                                    placeholder="Contoh: Jawa Barat"
+                                    placeholder="Contoh: Jawa Timur"
                                     value={data.pengprov}
                                     onChange={(e) => setData('pengprov', e.target.value)}
                                     error={errors.pengprov}
@@ -82,7 +86,7 @@ export default function DojosCreate() {
                                 <Input
                                     label="Pengkab / Pengkot"
                                     required
-                                    placeholder="Contoh: Kota Bandung"
+                                    placeholder="Contoh: Kota Surabaya"
                                     value={data.pengkab}
                                     onChange={(e) => setData('pengkab', e.target.value)}
                                     error={errors.pengkab}
@@ -124,6 +128,78 @@ export default function DojosCreate() {
                                         { value: 'suspended', label: 'Ditangguhkan' },
                                     ]}
                                     error={errors.status}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Geolocation & Attendance Radius Map Picker */}
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center gap-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400">
+                                    <MapPin className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <CardTitle>Titik Lokasi & Radius Presensi Dojo</CardTitle>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        Tentukan koordinat GPS tatami dan radius zona geofencing presensi kenshi secara presisi.
+                                    </p>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <DojoMapPicker
+                                latitude={data.latitude}
+                                longitude={data.longitude}
+                                radiusMeters={data.radius_meters}
+                                dojoName={data.name || 'Dojo Baru'}
+                                address={data.address}
+                                onChange={({ latitude, longitude, radiusMeters }) => {
+                                    setData((prev) => ({
+                                        ...prev,
+                                        latitude,
+                                        longitude,
+                                        radius_meters: radiusMeters,
+                                    }));
+                                }}
+                            />
+
+                            {/* Direct numeric inputs for Lat, Lng, Radius */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                <Input
+                                    label="Latitude"
+                                    type="number"
+                                    step="any"
+                                    value={data.latitude ?? ''}
+                                    onChange={(e) =>
+                                        setData('latitude', e.target.value ? parseFloat(e.target.value) : null)
+                                    }
+                                    error={errors.latitude}
+                                    placeholder="-7.318348"
+                                />
+                                <Input
+                                    label="Longitude"
+                                    type="number"
+                                    step="any"
+                                    value={data.longitude ?? ''}
+                                    onChange={(e) =>
+                                        setData('longitude', e.target.value ? parseFloat(e.target.value) : null)
+                                    }
+                                    error={errors.longitude}
+                                    placeholder="112.717755"
+                                />
+                                <Input
+                                    label="Radius Presensi (Meter)"
+                                    type="number"
+                                    min="10"
+                                    max="5000"
+                                    value={data.radius_meters}
+                                    onChange={(e) =>
+                                        setData('radius_meters', parseInt(e.target.value, 10) || 150)
+                                    }
+                                    error={errors.radius_meters}
+                                    hint="Jarak toleransi absensi kenshi (rekomendasi 100 - 250m)."
                                 />
                             </div>
                         </CardContent>

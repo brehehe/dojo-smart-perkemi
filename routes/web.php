@@ -10,6 +10,7 @@ use App\Http\Controllers\DojoDashboardController;
 use App\Http\Controllers\KenshiController;
 use App\Http\Controllers\KenshiPortalController;
 use App\Http\Controllers\ModuleHubController;
+use App\Http\Controllers\PengurusController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TrainingScheduleController;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,11 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/dojos', [DojoController::class, 'index'])->name('dojos.index');
     // Dojo Sensei Analytics & Monitoring Portal
     Route::get('/my-dojo', [DojoDashboardController::class, 'index'])->name('dojos.analytics');
+
+    // Pengkot & Pengprov Organization Portals & Rosters
+    Route::get('/pengkot', [PengurusController::class, 'pengkot'])->name('pengkot.index');
+    Route::get('/pengprov', [PengurusController::class, 'pengprov'])->name('pengprov.index');
+    Route::put('/pengurus/{pengurus}', [PengurusController::class, 'update'])->name('pengurus.update');
 
     // Kenshi Member Portal & Digital License (KTA)
     Route::get('/portal/kenshi', [KenshiPortalController::class, 'index'])->name('kenshis.portal');

@@ -155,6 +155,7 @@ export default function DojosIndex({ dojos, filters }: Props) {
                                     <TableHead>Wilayah / Pengprov</TableHead>
                                     <TableHead>Sensei Pembina</TableHead>
                                     <TableHead>Jumlah Kenshi</TableHead>
+                                    <TableHead>Radius & Peta</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead className="text-right">Aksi</TableHead>
                                 </TableRow>
@@ -193,6 +194,27 @@ export default function DojosIndex({ dojos, filters }: Props) {
                                                 <Users className="w-3.5 h-3.5 text-slate-400" />
                                                 {dojo.kenshis_count ?? 0} Kenshi
                                             </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-800">
+                                                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+                                                    {dojo.radius_meters ?? 150}m
+                                                </span>
+                                                {dojo.latitude && dojo.longitude ? (
+                                                    <a
+                                                        href={`https://www.google.com/maps/search/?api=1&query=${dojo.latitude},${dojo.longitude}`}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="inline-flex items-center gap-0.5 text-[11px] text-blue-600 hover:underline"
+                                                    >
+                                                        <MapPin className="w-3 h-3 text-red-500" />
+                                                        Peta Absensi
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-[10px] text-slate-400">Belum diset</span>
+                                                )}
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <Badge

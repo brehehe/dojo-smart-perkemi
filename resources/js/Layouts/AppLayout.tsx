@@ -14,6 +14,7 @@ import {
     Dumbbell,
     FileSpreadsheet,
     HeartPulse,
+    Landmark,
     LayoutDashboard,
     LogIn,
     LogOut,
@@ -98,6 +99,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             title: isKenshiOnly ? 'Identitas Atlet Kenshi' : 'Database & Profil Perkemi',
             items: [
                 { name: 'Daftar Cabang Dojo', href: '/dojos', icon: Shield, show: canViewDirectory },
+                { name: 'Pengurus Pengprov', href: '/pengprov', icon: Building2, badge: 'Jatim', show: canViewDirectory || isPengprovAdmin },
+                { name: 'Pengurus Pengkot', href: '/pengkot', icon: Landmark, badge: 'Surabaya', show: canViewDirectory || isPengkabAdmin },
                 { name: 'Atlet Kenshi', href: '/kenshis', icon: Users, show: canViewDirectory },
                 { name: 'Pelatih & Sensei', href: '/coaches', icon: UserCheck, badge: 'Yudansha', show: canViewDirectory },
                 { name: isKenshiOnly ? 'KTA Digital & Profil Saya' : 'KTA Digital Kenshi', href: '/portal/kenshi', icon: Award, show: canViewKtaPortal },

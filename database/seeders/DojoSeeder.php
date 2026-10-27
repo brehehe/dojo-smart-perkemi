@@ -118,6 +118,9 @@ class DojoSeeder extends Seeder
             );
             $kenshiUser->syncRoles(['Kenshi']);
 
+            $isAtletPengkot = in_array($idCard, ['KNS-SBY-001', 'KNS-SBY-002', 'KNS-SBY-008', 'KNS-SBY-003']);
+            $isAtletPengprov = in_array($idCard, ['KNS-SBY-001', 'KNS-SBY-008']);
+
             Kenshi::updateOrCreate(
                 ['id_card_number' => $idCard],
                 [
@@ -128,6 +131,10 @@ class DojoSeeder extends Seeder
                     'gender' => $gender,
                     'rank' => $rank,
                     'member_type' => $mType,
+                    'is_atlet_pengkot' => $isAtletPengkot,
+                    'is_atlet_pengprov' => $isAtletPengprov,
+                    'pengkot' => 'Kota Surabaya',
+                    'pengprov' => 'Jawa Timur',
                     'phone' => $phone,
                     'address' => $address,
                     'joined_at' => $joinedAt,

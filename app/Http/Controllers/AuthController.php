@@ -8,6 +8,7 @@ use App\Enums\DojoStatus;
 use App\Enums\KenshiRank;
 use App\Models\Dojo;
 use App\Models\Kenshi;
+use App\Models\Pengurus;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -51,9 +52,14 @@ class AuthController extends Controller
             'label' => $rank->label(),
         ]);
 
+        $pengkots = Pengurus::pengkot()->active()->orderBy('name')->get(['id', 'name', 'code', 'region']);
+        $pengprovs = Pengurus::pengprov()->active()->orderBy('name')->get(['id', 'name', 'code', 'region']);
+
         return Inertia::render('Auth/Register', [
             'dojos' => $dojos,
             'ranks' => $ranks,
+            'pengkots' => $pengkots,
+            'pengprovs' => $pengprovs,
         ]);
     }
 
@@ -69,6 +75,12 @@ class AuthController extends Controller
             'dojo_id' => ['required', 'uuid', 'exists:dojos,id'],
             'id_card_number' => ['nullable', 'string', 'max:30', 'unique:kenshis,id_card_number'],
             'gender' => ['required', Rule::in(['M', 'F'])],
+            'is_atlet_pengkot' => ['nullable', 'boolean'],
+            'pengkot_id' => ['nullable', 'uuid', 'exists:pengurus,id'],
+            'is_atlet_pengprov' => ['nullable', 'boolean'],
+            'pengprov_id' => ['nullable', 'uuid', 'exists:pengurus,id'],
+            'pengkot' => ['nullable', 'string', 'max:100'],
+            'pengprov' => ['nullable', 'string', 'max:100'],
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string', 'max:500'],
             'rank' => ['nullable', Rule::enum(KenshiRank::class)],
@@ -91,6 +103,10 @@ class AuthController extends Controller
                 ? KenshiRank::from($validated['rank'])
                 : KenshiRank::Minarai;
 
+            $dojo = Dojo::find($validated['dojo_id']);
+            $pengkotOrg = ! empty($validated['pengkot_id']) ? Pengurus::find($validated['pengkot_id']) : null;
+            $pengprovOrg = ! empty($validated['pengprov_id']) ? Pengurus::find($validated['pengprov_id']) : null;
+
             Kenshi::create([
                 'user_id' => $user->id,
                 'dojo_id' => $validated['dojo_id'],
@@ -99,6 +115,12 @@ class AuthController extends Controller
                 'gender' => $validated['gender'],
                 'rank' => $rank,
                 'member_type' => 'athlete',
+                'is_atlet_pengkot' => ! empty($validated['is_atlet_pengkot']),
+                'is_atlet_pengprov' => ! empty($validated['is_atlet_pengprov']),
+                'pengkot_id' => $pengkotOrg?->id,
+                'pengprov_id' => $pengprovOrg?->id,
+                'pengkot' => $pengkotOrg?->region ?? $pengkotOrg?->name ?? $validated['pengkot'] ?? $dojo?->pengkab,
+                'pengprov' => $pengprovOrg?->region ?? $pengprovOrg?->name ?? $validated['pengprov'] ?? $dojo?->pengprov,
                 'phone' => $validated['phone'] ?? null,
                 'address' => $validated['address'] ?? null,
                 'joined_at' => now()->toDateString(),
@@ -157,6 +179,14 @@ class AuthController extends Controller
      */
     private function redirectByRole(User $user): RedirectResponse
     {
+        if ($user->hasRole('PengprovAdmin')) {
+            return redirect()->route('pengprov.index');
+        }
+
+        if ($user->hasRole('PengkabAdmin')) {
+            return redirect()->route('pengkot.index');
+        }
+
         if ($user->hasRole('Sensei')) {
             return redirect()->route('dojos.analytics');
         }
