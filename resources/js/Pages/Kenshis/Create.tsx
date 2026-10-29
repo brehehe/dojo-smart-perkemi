@@ -83,7 +83,7 @@ export default function KenshisCreate({ dojos, ranks, pengkots = [], pengprovs =
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <Input
-                                    label="Nomor Pokok / NIK / KTA"
+                                    label="NOMOR NIK ( Nomor Induk Kenshi )"
                                     required
                                     placeholder="Contoh: KNS-2026-0099"
                                     value={data.id_card_number}
