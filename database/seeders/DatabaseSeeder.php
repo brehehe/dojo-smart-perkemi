@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             DojoSeeder::class,
             PengurusSeeder::class,
             TrainingScheduleSeeder::class,
+            PengurusCsvSeeder::class,
+            DojoCsvSeeder::class,
         ]);
     }
 }
