@@ -246,7 +246,7 @@ export default function Register({ dojos, ranks, pengkots = [], pengprovs = [] }
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <Input
-                                    label="Nomor KTA / NIK (Opsional)"
+                                    label="NOMOR NIK ( Nomor Induk Kenshi )"
                                     type="text"
                                     placeholder="Contoh: KNS-SBY-009"
                                     value={data.id_card_number}
