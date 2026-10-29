@@ -152,29 +152,38 @@ export default function KenshisShow({ kenshi: rawKenshi }: Props) {
                                 </div>
                             </div>
 
-                            {/* Afiliasi Atlet Prestasi (Pengkot / Pengprov) */}
-                            <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
-                                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1.5">
-                                    Status Atlet Berprestasi Perkemi
+                            {/* Asal Afiliasi Organisasi & Pembinaan (Dojo, Pengkot, Pengprov) */}
+                            <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50 space-y-2">
+                                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                                    Asal Organisasi & Afiliasi Pembinaan
                                 </span>
-                                <div className="flex flex-wrap items-center gap-2">
-                                    {kenshi.is_atlet_pengkot && (
-                                        <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900/60">
-                                            <Sparkles className="h-3.5 w-3.5 text-rose-500" />
-                                            Atlet Pengkot {kenshi.pengkot ? `(${kenshi.pengkot})` : ''}
-                                        </span>
-                                    )}
-                                    {kenshi.is_atlet_pengprov && (
-                                        <span className="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900/60">
-                                            <Trophy className="h-3.5 w-3.5 text-purple-500" />
-                                            Atlet Pengprov {kenshi.pengprov ? `(${kenshi.pengprov})` : ''}
-                                        </span>
-                                    )}
-                                    {!kenshi.is_atlet_pengkot && !kenshi.is_atlet_pengprov && (
-                                        <span className="text-xs text-slate-500 dark:text-slate-400">
-                                            Kenshi Reguler Cabang Dojo
-                                        </span>
-                                    )}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-xs py-1 border-b border-slate-200/60 dark:border-slate-800">
+                                        <span className="text-slate-500 dark:text-slate-400 font-medium">1. Asal Dojo (Latihan Rutin):</span>
+                                        <span className="font-bold text-slate-800 dark:text-slate-200">{kenshi.dojo?.name || '-'}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-xs py-1 border-b border-slate-200/60 dark:border-slate-800">
+                                        <span className="text-slate-500 dark:text-slate-400 font-medium">2. Asal Pengkot / Pengkab (Kewenangan TC):</span>
+                                        {kenshi.is_atlet_pengkot ? (
+                                            <span className="inline-flex items-center gap-1 rounded bg-rose-50 px-2 py-0.5 text-xs font-bold text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900/60">
+                                                <Sparkles className="h-3 w-3 text-rose-500" />
+                                                {kenshi.pengkot || 'Kota Surabaya'}
+                                            </span>
+                                        ) : (
+                                            <span className="text-slate-400">Belum Terdaftar</span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center justify-between text-xs py-1">
+                                        <span className="text-slate-500 dark:text-slate-400 font-medium">3. Asal Pengprov (Hak Tim Puslatda):</span>
+                                        {kenshi.is_atlet_pengprov ? (
+                                            <span className="inline-flex items-center gap-1 rounded bg-purple-50 px-2 py-0.5 text-xs font-bold text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900/60">
+                                                <Trophy className="h-3 w-3 text-purple-500" />
+                                                {kenshi.pengprov || 'Jawa Timur'}
+                                            </span>
+                                        ) : (
+                                            <span className="text-slate-400">Belum Terdaftar</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 

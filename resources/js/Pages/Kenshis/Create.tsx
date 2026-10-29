@@ -7,7 +7,7 @@ import { Input } from '@/Components/UI/Forms/Input';
 import { Select } from '@/Components/UI/Forms/Select';
 import { Textarea } from '@/Components/UI/Forms/Textarea';
 import { Button } from '@/Components/UI/Elements/Button';
-import { ArrowLeft, Save, Sparkles, Trophy, UserPlus } from 'lucide-react';
+import { ArrowLeft, Save, Shield, Sparkles, Trophy, UserPlus } from 'lucide-react';
 
 interface PengurusOption {
     id: string;
@@ -26,14 +26,6 @@ interface Props {
 export default function KenshisCreate({ dojos, ranks, pengkots = [], pengprovs = [] }: Props) {
     const dojosList = Array.isArray(dojos) ? dojos : dojos.data;
 
-    const defaultPengkot = pengkots.find(
-        (p) => p.region.toLowerCase().includes('surabaya') || p.name.toLowerCase().includes('surabaya')
-    ) || pengkots[0];
-
-    const defaultPengprov = pengprovs.find(
-        (p) => p.region.toLowerCase().includes('jawa timur') || p.name.toLowerCase().includes('jawa timur')
-    ) || pengprovs[0];
-
     const { data, setData, post, processing, errors } = useForm({
         id_card_number: '',
         dojo_id: dojosList[0]?.id || '',
@@ -46,11 +38,11 @@ export default function KenshisCreate({ dojos, ranks, pengkots = [], pengprovs =
         blood_type: 'O',
         rank: ranks[0]?.value || 'minarai',
         is_atlet_pengkot: false,
-        pengkot_id: defaultPengkot?.id || '',
-        pengkot: defaultPengkot?.region || 'Kota Surabaya',
+        pengkot_id: '',
+        pengkot: '',
         is_atlet_pengprov: false,
-        pengprov_id: defaultPengprov?.id || '',
-        pengprov: defaultPengprov?.region || 'Jawa Timur',
+        pengprov_id: '',
+        pengprov: '',
         phone: '',
         address: '',
         joined_at: new Date().toISOString().slice(0, 10),
@@ -89,7 +81,7 @@ export default function KenshisCreate({ dojos, ranks, pengkots = [], pengprovs =
                             <CardTitle>Biodata Kenshi / Pelatih</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <Input
                                     label="Nomor Pokok / NIK / KTA"
                                     required
@@ -110,17 +102,124 @@ export default function KenshisCreate({ dojos, ranks, pengkots = [], pengprovs =
                                     ]}
                                     error={errors.member_type}
                                 />
-                                <Select
-                                    label="Asal Dojo"
-                                    required
-                                    value={data.dojo_id}
-                                    onChange={(e) => setData('dojo_id', e.target.value)}
-                                    options={dojosList.map((d) => ({
-                                        value: d.id,
-                                        label: `${d.name} (${d.pengprov})`,
-                                    }))}
-                                    error={errors.dojo_id}
-                                />
+                            </div>
+
+                            {/* Asal Organisasi & Pembinaan Kenshi (Dojo, Pengkot/Pengkab, Pengprov) */}
+                            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-4 dark:border-slate-800 dark:bg-slate-900/50">
+                                <div className="flex items-center gap-2 pb-1 border-b border-slate-200/80 dark:border-slate-800">
+                                    <Shield className="h-4 w-4 text-red-600" />
+                                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                        Asal Organisasi & Afiliasi Atlet
+                                    </span>
+                                </div>
+
+                                {/* 2.1. Asal Dojo (Wajib) */}
+                                <div className="space-y-1">
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                        Asal Dojo <span className="text-red-600">*</span>
+                                    </label>
+                                    <select
+                                        required
+                                        value={data.dojo_id}
+                                        onChange={(e) => setData('dojo_id', e.target.value)}
+                                        className="w-full rounded-lg border-slate-300 text-xs sm:text-sm bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 py-2 px-3 focus:border-red-500 focus:ring-red-500 shadow-2xs"
+                                    >
+                                        <option value="" disabled>-- Pilih Asal Dojo --</option>
+                                        {dojosList.map((d) => (
+                                            <option key={d.id} value={d.id}>
+                                                {d.name} — {d.pengprov} {d.pengkab ? `(${d.pengkab})` : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                        Untuk aplikasi Dojo dan jadwal latihan rutin dojo.
+                                    </p>
+                                    {errors.dojo_id && (
+                                        <p className="text-xs text-rose-600 mt-1">{errors.dojo_id}</p>
+                                    )}
+                                </div>
+
+                                {/* 2.2. Asal Pengkot / Pengkab (Opsional) */}
+                                <div className="space-y-1">
+                                    <div className="flex items-center justify-between">
+                                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                            Asal Pengkot / Pengkab <span className="text-slate-400 font-normal">(Opsional)</span>
+                                        </label>
+                                        {data.is_atlet_pengkot && (
+                                            <span className="text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900/60">
+                                                Atlet Pengkot
+                                            </span>
+                                        )}
+                                    </div>
+                                    <select
+                                        value={data.pengkot_id}
+                                        onChange={(e) => {
+                                            const selectedId = e.target.value;
+                                            const selected = pengkots.find((p) => p.id === selectedId);
+                                            setData((prev) => ({
+                                                ...prev,
+                                                pengkot_id: selectedId,
+                                                pengkot: selected ? (selected.region || selected.name) : '',
+                                                is_atlet_pengkot: Boolean(selectedId),
+                                            }));
+                                        }}
+                                        className="w-full rounded-lg border-slate-300 text-xs sm:text-sm bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 py-2 px-3 focus:border-red-500 focus:ring-red-500 shadow-2xs"
+                                    >
+                                        <option value="">-- Tidak / Belum Terdaftar di Pengkot (Opsional) --</option>
+                                        {pengkots.map((p) => (
+                                            <option key={p.id} value={p.id}>
+                                                {p.name} {p.region ? `(${p.region})` : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                        Kewenangan untuk atlet kota/kabupaten dan TC serta jadwal TC.
+                                    </p>
+                                    {errors.pengkot_id && (
+                                        <p className="text-xs text-rose-600 mt-1">{errors.pengkot_id}</p>
+                                    )}
+                                </div>
+
+                                {/* 2.3. Asal Pengprov (Opsional) */}
+                                <div className="space-y-1">
+                                    <div className="flex items-center justify-between">
+                                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                            Asal Pengprov <span className="text-slate-400 font-normal">(Opsional)</span>
+                                        </label>
+                                        {data.is_atlet_pengprov && (
+                                            <span className="text-[10px] font-bold text-purple-600 bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900/60">
+                                                Atlet Puslatda / Pengprov
+                                            </span>
+                                        )}
+                                    </div>
+                                    <select
+                                        value={data.pengprov_id}
+                                        onChange={(e) => {
+                                            const selectedId = e.target.value;
+                                            const selected = pengprovs.find((p) => p.id === selectedId);
+                                            setData((prev) => ({
+                                                ...prev,
+                                                pengprov_id: selectedId,
+                                                pengprov: selected ? (selected.region || selected.name) : '',
+                                                is_atlet_pengprov: Boolean(selectedId),
+                                            }));
+                                        }}
+                                        className="w-full rounded-lg border-slate-300 text-xs sm:text-sm bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 py-2 px-3 focus:border-purple-500 focus:ring-purple-500 shadow-2xs"
+                                    >
+                                        <option value="">-- Tidak / Belum Terdaftar di Pengprov (Opsional) --</option>
+                                        {pengprovs.map((p) => (
+                                            <option key={p.id} value={p.id}>
+                                                {p.name} {p.region ? `(${p.region})` : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                        Hak tim Puslatda TC dan jadwal TC Puslatda.
+                                    </p>
+                                    {errors.pengprov_id && (
+                                        <p className="text-xs text-rose-600 mt-1">{errors.pengprov_id}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -176,139 +275,7 @@ export default function KenshisCreate({ dojos, ranks, pengkots = [], pengprovs =
                                 />
                             </div>
 
-                            {/* Afiliasi Atlet Prestasi (Pengkot / Pengprov) */}
-                            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-3 dark:border-slate-800 dark:bg-slate-900/50">
-                                <div className="flex items-center gap-2">
-                                    <Trophy className="h-4 w-4 text-amber-600" />
-                                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                        Status Atlet Berprestasi Perkemi
-                                    </span>
-                                </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {/* Atlet Pengkot */}
-                                    <div className="space-y-2 p-3 rounded-lg border border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900">
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={data.is_atlet_pengkot}
-                                                onChange={(e) => {
-                                                    const checked = e.target.checked;
-                                                    setData((prev) => ({
-                                                        ...prev,
-                                                        is_atlet_pengkot: checked,
-                                                        pengkot_id: checked ? (prev.pengkot_id || defaultPengkot?.id || '') : '',
-                                                        pengkot: checked ? (prev.pengkot || defaultPengkot?.region || 'Kota Surabaya') : '',
-                                                    }));
-                                                }}
-                                                className="h-4 w-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
-                                            />
-                                            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                                Atlet Pengkot (Opsional)
-                                            </span>
-                                        </label>
-
-                                        {data.is_atlet_pengkot && (
-                                            <div className="space-y-2 pt-1">
-                                                {pengkots.length > 0 && (
-                                                    <div className="space-y-1">
-                                                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">
-                                                            Pilih Pengurus Cabang (Pengkot/Pengkab)
-                                                        </label>
-                                                        <select
-                                                            value={data.pengkot_id}
-                                                            onChange={(e) => {
-                                                                const selected = pengkots.find((p) => p.id === e.target.value);
-                                                                setData((prev) => ({
-                                                                    ...prev,
-                                                                    pengkot_id: e.target.value,
-                                                                    pengkot: selected ? selected.region : prev.pengkot,
-                                                                }));
-                                                            }}
-                                                            className="w-full rounded-lg border-slate-300 text-xs sm:text-sm bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 py-2 px-3"
-                                                        >
-                                                            {pengkots.map((p) => (
-                                                                <option key={p.id} value={p.id}>
-                                                                    {p.name} ({p.region})
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                )}
-                                                <Input
-                                                    label="Nama Wilayah Pengkot"
-                                                    placeholder="Contoh: Kota Surabaya"
-                                                    value={data.pengkot}
-                                                    onChange={(e) => setData('pengkot', e.target.value)}
-                                                    error={errors.pengkot}
-                                                    hint="Tersimpan di pangkalan Pengkot Kota Surabaya."
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Atlet Pengprov */}
-                                    <div className="space-y-2 p-3 rounded-lg border border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900">
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={data.is_atlet_pengprov}
-                                                onChange={(e) => {
-                                                    const checked = e.target.checked;
-                                                    setData((prev) => ({
-                                                        ...prev,
-                                                        is_atlet_pengprov: checked,
-                                                        pengprov_id: checked ? (prev.pengprov_id || defaultPengprov?.id || '') : '',
-                                                        pengprov: checked ? (prev.pengprov || defaultPengprov?.region || 'Jawa Timur') : '',
-                                                    }));
-                                                }}
-                                                className="h-4 w-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
-                                            />
-                                            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                                Atlet Pengprov (Opsional)
-                                            </span>
-                                        </label>
-
-                                        {data.is_atlet_pengprov && (
-                                            <div className="space-y-2 pt-1">
-                                                {pengprovs.length > 0 && (
-                                                    <div className="space-y-1">
-                                                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">
-                                                            Pilih Pengurus Daerah (Pengprov)
-                                                        </label>
-                                                        <select
-                                                            value={data.pengprov_id}
-                                                            onChange={(e) => {
-                                                                const selected = pengprovs.find((p) => p.id === e.target.value);
-                                                                setData((prev) => ({
-                                                                    ...prev,
-                                                                    pengprov_id: e.target.value,
-                                                                    pengprov: selected ? selected.region : prev.pengprov,
-                                                                }));
-                                                            }}
-                                                            className="w-full rounded-lg border-slate-300 text-xs sm:text-sm bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 py-2 px-3"
-                                                        >
-                                                            {pengprovs.map((p) => (
-                                                                <option key={p.id} value={p.id}>
-                                                                    {p.name} ({p.region})
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                )}
-                                                <Input
-                                                    label="Nama Wilayah Pengprov"
-                                                    placeholder="Contoh: Jawa Timur"
-                                                    value={data.pengprov}
-                                                    onChange={(e) => setData('pengprov', e.target.value)}
-                                                    error={errors.pengprov}
-                                                    hint="Tersimpan di pangkalan Pengprov Jawa Timur."
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <Input

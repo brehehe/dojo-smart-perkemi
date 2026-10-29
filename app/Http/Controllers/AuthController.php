@@ -107,6 +107,9 @@ class AuthController extends Controller
             $pengkotOrg = ! empty($validated['pengkot_id']) ? Pengurus::find($validated['pengkot_id']) : null;
             $pengprovOrg = ! empty($validated['pengprov_id']) ? Pengurus::find($validated['pengprov_id']) : null;
 
+            $isAtletPengkot = ! empty($validated['is_atlet_pengkot']) || ! empty($pengkotOrg);
+            $isAtletPengprov = ! empty($validated['is_atlet_pengprov']) || ! empty($pengprovOrg);
+
             Kenshi::create([
                 'user_id' => $user->id,
                 'dojo_id' => $validated['dojo_id'],
@@ -115,12 +118,12 @@ class AuthController extends Controller
                 'gender' => $validated['gender'],
                 'rank' => $rank,
                 'member_type' => 'athlete',
-                'is_atlet_pengkot' => ! empty($validated['is_atlet_pengkot']),
-                'is_atlet_pengprov' => ! empty($validated['is_atlet_pengprov']),
-                'pengkot_id' => $pengkotOrg?->id,
-                'pengprov_id' => $pengprovOrg?->id,
-                'pengkot' => $pengkotOrg?->region ?? $pengkotOrg?->name ?? $validated['pengkot'] ?? $dojo?->pengkab,
-                'pengprov' => $pengprovOrg?->region ?? $pengprovOrg?->name ?? $validated['pengprov'] ?? $dojo?->pengprov,
+                'is_atlet_pengkot' => $isAtletPengkot,
+                'is_atlet_pengprov' => $isAtletPengprov,
+                'pengkot_id' => $isAtletPengkot ? $pengkotOrg?->id : null,
+                'pengprov_id' => $isAtletPengprov ? $pengprovOrg?->id : null,
+                'pengkot' => $isAtletPengkot ? ($pengkotOrg?->region ?? $pengkotOrg?->name ?? $validated['pengkot'] ?? $dojo?->pengkab) : null,
+                'pengprov' => $isAtletPengprov ? ($pengprovOrg?->region ?? $pengprovOrg?->name ?? $validated['pengprov'] ?? $dojo?->pengprov) : null,
                 'phone' => $validated['phone'] ?? null,
                 'address' => $validated['address'] ?? null,
                 'joined_at' => now()->toDateString(),

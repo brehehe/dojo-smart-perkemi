@@ -327,7 +327,29 @@ class KenshiController extends Controller
      */
     public function update(UpdateKenshiRequest $request, Kenshi $kenshi): RedirectResponse
     {
-        $kenshi->update($request->validated());
+        $validated = $request->validated();
+
+        $isPengkot = ! empty($validated['is_atlet_pengkot']) || ! empty($validated['pengkot_id']);
+        $validated['is_atlet_pengkot'] = $isPengkot;
+        if (! $isPengkot) {
+            $validated['pengkot_id'] = null;
+            $validated['pengkot'] = null;
+        } elseif (empty($validated['pengkot']) && ! empty($validated['pengkot_id'])) {
+            $pengkot = Pengurus::find($validated['pengkot_id']);
+            $validated['pengkot'] = $pengkot?->region ?? $pengkot?->name;
+        }
+
+        $isPengprov = ! empty($validated['is_atlet_pengprov']) || ! empty($validated['pengprov_id']);
+        $validated['is_atlet_pengprov'] = $isPengprov;
+        if (! $isPengprov) {
+            $validated['pengprov_id'] = null;
+            $validated['pengprov'] = null;
+        } elseif (empty($validated['pengprov']) && ! empty($validated['pengprov_id'])) {
+            $pengprov = Pengurus::find($validated['pengprov_id']);
+            $validated['pengprov'] = $pengprov?->region ?? $pengprov?->name;
+        }
+
+        $kenshi->update($validated);
 
         activity('kenshi')
             ->performedOn($kenshi)

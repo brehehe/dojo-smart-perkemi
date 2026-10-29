@@ -191,4 +191,69 @@ class KenshiManagementTest extends TestCase
             'pengkot' => 'Kota Surabaya',
         ]);
     }
+
+    public function test_can_update_kenshi_organization_affiliations_without_checkbox(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('SuperAdmin');
+
+        $dojo = Dojo::create([
+            'code' => 'DOJO-TEST-AFFIL',
+            'name' => 'Dojo Affiliation Test',
+            'pengprov' => 'Jawa Timur',
+            'pengkab' => 'Kota Surabaya',
+            'status' => DojoStatus::Active,
+        ]);
+
+        $pengkot = \App\Models\Pengurus::create([
+            'type' => 'pengkot',
+            'name' => 'Pengkot PERKEMI Surabaya',
+            'code' => 'PK-SBY-99',
+            'region' => 'Kota Surabaya',
+            'status' => 'active',
+        ]);
+
+        $kenshi = Kenshi::create([
+            'id_card_number' => 'KNS-AFFIL-001',
+            'dojo_id' => $dojo->id,
+            'full_name' => 'Kenshi Afiliasi',
+            'gender' => 'M',
+            'rank' => KenshiRank::Minarai,
+            'is_atlet_pengkot' => false,
+            'is_active' => true,
+        ]);
+
+        // Update with Pengkot affiliation selected from dropdown
+        $response = $this->actingAs($admin)->put("/kenshis/{$kenshi->id}", [
+            'id_card_number' => 'KNS-AFFIL-001',
+            'dojo_id' => $dojo->id,
+            'full_name' => 'Kenshi Afiliasi Updated',
+            'gender' => 'M',
+            'rank' => 'minarai',
+            'pengkot_id' => $pengkot->id,
+            'is_active' => true,
+        ]);
+
+        $response->assertRedirect('/kenshis');
+        $kenshi->refresh();
+        $this->assertTrue((bool) $kenshi->is_atlet_pengkot);
+        $this->assertEquals($pengkot->id, $kenshi->pengkot_id);
+        $this->assertEquals('Kota Surabaya', $kenshi->pengkot);
+
+        // Update with empty Pengkot (optional deselected)
+        $this->actingAs($admin)->put("/kenshis/{$kenshi->id}", [
+            'id_card_number' => 'KNS-AFFIL-001',
+            'dojo_id' => $dojo->id,
+            'full_name' => 'Kenshi Afiliasi Cleared',
+            'gender' => 'M',
+            'rank' => 'minarai',
+            'pengkot_id' => '',
+            'is_active' => true,
+        ]);
+
+        $kenshi->refresh();
+        $this->assertFalse((bool) $kenshi->is_atlet_pengkot);
+        $this->assertNull($kenshi->pengkot_id);
+        $this->assertNull($kenshi->pengkot);
+    }
 }

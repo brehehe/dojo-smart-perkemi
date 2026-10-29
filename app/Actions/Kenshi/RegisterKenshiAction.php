@@ -48,6 +48,26 @@ class RegisterKenshiAction
                 $data['user_id'] = $userId;
             }
 
+            $isPengkot = ! empty($data['is_atlet_pengkot']) || ! empty($data['pengkot_id']);
+            $data['is_atlet_pengkot'] = $isPengkot;
+            if (! $isPengkot) {
+                $data['pengkot_id'] = null;
+                $data['pengkot'] = null;
+            } elseif (empty($data['pengkot']) && ! empty($data['pengkot_id'])) {
+                $pengkot = \App\Models\Pengurus::find($data['pengkot_id']);
+                $data['pengkot'] = $pengkot?->region ?? $pengkot?->name;
+            }
+
+            $isPengprov = ! empty($data['is_atlet_pengprov']) || ! empty($data['pengprov_id']);
+            $data['is_atlet_pengprov'] = $isPengprov;
+            if (! $isPengprov) {
+                $data['pengprov_id'] = null;
+                $data['pengprov'] = null;
+            } elseif (empty($data['pengprov']) && ! empty($data['pengprov_id'])) {
+                $pengprov = \App\Models\Pengurus::find($data['pengprov_id']);
+                $data['pengprov'] = $pengprov?->region ?? $pengprov?->name;
+            }
+
             $kenshi = Kenshi::create($data);
 
             activity('kenshi')
