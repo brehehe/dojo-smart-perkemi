@@ -75,7 +75,7 @@ class PengurusCsvSeeder extends Seeder
             ['code' => 'PENGPROV-JATIM'],
             [
                 'type' => 'pengprov',
-                'name' => 'Pengprov PERKEMI Jawa Timur',
+                'name' => 'PERKEMI Pengprov Jawa Timur',
                 'region' => 'Jawa Timur',
                 'user_id' => $pengprovUser->id,
                 'sk_number' => 'SK-PB-023/PERKEMI/2024',
@@ -154,16 +154,16 @@ class PengurusCsvSeeder extends Seeder
             $typePrefix = $isKab ? 'pengkab' : 'pengkot';
             $email = "{$typePrefix}.{$slug}@perkemi.id";
 
-            $orgPrefix = $isKab ? 'Pengkab' : 'Pengkot';
-            $orgName = "{$orgPrefix} PERKEMI {$cabangClean}";
-
-            $leaderName = trim($row['Nama Ketua'] ?? '');
-            $userName = $leaderName !== '' ? $leaderName : "Pengurus {$orgName}";
-
             // Keep compatibility with PENGKOT-SBY identifier for Surabaya Kota
             $isSurabaya = $normalizedCode === '13.01' || str_contains(strtolower($cabangClean), 'surabaya');
             $code = $isSurabaya ? 'PENGKOT-SBY' : $normalizedCode;
             $region = $isSurabaya ? 'Kota Surabaya' : $cabangClean;
+
+            $orgPrefix = $isKab ? 'Pengkab' : 'Pengkot';
+            $orgName = "PERKEMI {$orgPrefix} ".($isSurabaya ? 'Kota Surabaya' : $cabangClean);
+
+            $leaderName = trim($row['Nama Ketua'] ?? '');
+            $userName = $leaderName !== '' ? $leaderName : "Pengurus {$orgName}";
 
             // 4. Create / Update User Account with PengkabAdmin role
             $user = User::updateOrCreate(
@@ -245,4 +245,3 @@ class PengurusCsvSeeder extends Seeder
             ->update(['pengprov_id' => $pengprovOrg->id, 'pengprov' => 'Jawa Timur']);
     }
 }
-
