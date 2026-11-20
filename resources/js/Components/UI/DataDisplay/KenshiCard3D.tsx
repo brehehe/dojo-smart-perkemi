@@ -126,9 +126,9 @@ export function KenshiCard3D({ kenshi, qrValue, showControls = true }: Props) {
                         className="relative overflow-hidden rounded-3xl border border-amber-500/30 p-6 text-white shadow-2xl transition-all"
                         style={{
                             backfaceVisibility: 'hidden',
-                            background: 'linear-gradient(135deg, #0b0f19 0%, #1e1b4b 45%, #0f172a 100%)',
+                            background: 'linear-gradient(135deg, #091a27 0%, #102B40 50%, #06111a 100%)',
                             boxShadow: isHovered
-                                ? '0 25px 50px -12px rgba(99, 102, 241, 0.35), 0 0 40px rgba(245, 158, 11, 0.2)'
+                                ? '0 25px 50px -12px rgba(16, 43, 64, 0.5), 0 0 30px rgba(245, 158, 11, 0.15)'
                                 : '0 20px 35px -10px rgba(0, 0, 0, 0.6)',
                         }}
                     >
@@ -320,25 +320,25 @@ export function KenshiCard3D({ kenshi, qrValue, showControls = true }: Props) {
                     <button
                         type="button"
                         onClick={() => setIsFlipped(!isFlipped)}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#E8EBEF] bg-white px-3.5 py-2 text-xs font-semibold text-[#17202D] shadow-2xs transition hover:bg-[#F8F9FA] active:bg-[#E8EBEF]"
                     >
-                        <RotateCw className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                        <RotateCw className="h-3.5 w-3.5 text-[#102B40]" />
                         {isFlipped ? 'Lihat Sisi Depan' : 'Putar Kartu (Sisi Belakang)'}
                     </button>
 
                     <button
                         type="button"
                         onClick={handleCopy}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#E8EBEF] bg-white px-3.5 py-2 text-xs font-semibold text-[#17202D] shadow-2xs transition hover:bg-[#F8F9FA] active:bg-[#E8EBEF]"
                     >
                         {copied ? (
                             <>
-                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                                <span className="text-emerald-600">Tersalin!</span>
+                                <CheckCircle2 className="h-3.5 w-3.5 text-[#16865C]" />
+                                <span className="text-[#16865C]">Tersalin!</span>
                             </>
                         ) : (
                             <>
-                                <Copy className="h-3.5 w-3.5 text-slate-500" />
+                                <Copy className="h-3.5 w-3.5 text-[#718092]" />
                                 Salin URL Verifikasi
                             </>
                         )}
@@ -348,7 +348,7 @@ export function KenshiCard3D({ kenshi, qrValue, showControls = true }: Props) {
                         <a
                             href={qrCodeUrl}
                             download={`KTA-QR-${displayName.replace(/\s+/g, '_')}.png`}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:from-red-700 hover:to-amber-700"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-[#C51C2A] px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition hover:bg-[#a51522] active:bg-[#8e121d]"
                         >
                             <Download className="h-3.5 w-3.5" />
                             Download QR Code

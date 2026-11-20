@@ -37,35 +37,44 @@ export const Pagination: React.FC<PaginationProps> = ({
     const displayTo = to ?? meta?.to;
     const displayTotal = total ?? meta?.total;
 
-    if (!Array.isArray(linkItems) || linkItems.length <= 3) {
+    if (!Array.isArray(linkItems) || linkItems.length <= 1) {
         return null;
     }
 
     return (
         <div
             className={cn(
-                'flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-2',
+                'flex flex-col sm:flex-row items-center justify-between gap-3 py-4 px-1 text-xs text-[#718092]',
                 className
             )}
         >
             {displayFrom !== undefined && displayTo !== undefined && displayTotal !== undefined && (
-                <p className="text-xs text-slate-500">
-                    Menampilkan <span className="font-semibold text-slate-700">{displayFrom || 0}</span> -{' '}
-                    <span className="font-semibold text-slate-700">{displayTo || 0}</span> dari{' '}
-                    <span className="font-semibold text-slate-700">{displayTotal}</span> data
+                <p>
+                    Menampilkan <span className="font-semibold text-[#17202D]">{displayFrom || 0}</span> -{' '}
+                    <span className="font-semibold text-[#17202D]">{displayTo || 0}</span> dari{' '}
+                    <span className="font-semibold text-[#17202D]">{displayTotal}</span> data
                 </p>
             )}
 
-            <nav className="inline-flex -space-x-px rounded-lg shadow-xs" aria-label="Pagination">
+            <nav className="inline-flex -space-x-px rounded-lg shadow-2xs overflow-hidden" aria-label="Navigasi Halaman">
                 {linkItems.map((link, index) => {
-                    const isPrevious = link.label.includes('Previous') || link.label.includes('&laquo;');
-                    const isNext = link.label.includes('Next') || link.label.includes('&raquo;');
+                    const rawLabel = String(link.label || '').toLowerCase();
+                    const isPrevious =
+                        rawLabel.includes('previous') ||
+                        rawLabel.includes('&laquo;') ||
+                        rawLabel.includes('sebelumnya') ||
+                        rawLabel.includes('laquo');
+                    const isNext =
+                        rawLabel.includes('next') ||
+                        rawLabel.includes('&raquo;') ||
+                        rawLabel.includes('berikutnya') ||
+                        rawLabel.includes('raquo');
 
                     let content: React.ReactNode = link.label;
                     if (isPrevious) {
-                        content = <ChevronLeft className="w-4 h-4" />;
+                        content = <ChevronLeft className="w-4 h-4" aria-label="Sebelumnya" />;
                     } else if (isNext) {
-                        content = <ChevronRight className="w-4 h-4" />;
+                        content = <ChevronRight className="w-4 h-4" aria-label="Berikutnya" />;
                     }
 
                     if (!link.url) {
@@ -73,9 +82,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                             <span
                                 key={index}
                                 className={cn(
-                                    'inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium text-slate-400 bg-white border border-slate-200 cursor-not-allowed select-none',
-                                    index === 0 && 'rounded-l-lg',
-                                    index === linkItems.length - 1 && 'rounded-r-lg'
+                                    'inline-flex items-center justify-center min-w-[34px] h-9 px-3 text-xs font-medium text-slate-300 bg-white border border-[#E8EBEF] cursor-not-allowed select-none'
                                 )}
                             >
                                 {content}
@@ -90,12 +97,10 @@ export const Pagination: React.FC<PaginationProps> = ({
                             preserveScroll
                             preserveState
                             className={cn(
-                                'inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium transition-colors border select-none',
-                                index === 0 && 'rounded-l-lg',
-                                index === linkItems.length - 1 && 'rounded-r-lg',
+                                'inline-flex items-center justify-center min-w-[34px] h-9 px-3 text-xs font-medium transition-colors border select-none',
                                 link.active
-                                    ? 'z-10 bg-red-600 border-red-600 text-white font-semibold'
-                                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                                    ? 'z-10 bg-[#C51C2A] border-[#C51C2A] text-white font-bold'
+                                    : 'bg-white border-[#E8EBEF] text-[#17202D] hover:bg-slate-50'
                             )}
                         >
                             {content}

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             TrainingScheduleSeeder::class,
             PengurusCsvSeeder::class,
             DojoCsvSeeder::class,
+            CurriculumAndDuesSeeder::class,
         ]);
     }
 }

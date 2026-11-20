@@ -63,36 +63,36 @@ export default function KenshiPortal({ kenshi: rawKenshi, roadmap, cardSecurityH
 
                     {/* Quick Stats below card */}
                     <div className="w-full max-w-sm mt-4 grid grid-cols-2 gap-3">
-                        <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-xs">
-                            <span className="text-xl font-bold text-slate-900 block">
-                                {kenshi.rank.is_dan ? 'Yudansha' : 'Mudansha'}
+                        <div className="rounded-xl border border-[#E8EBEF] bg-white p-3.5 text-center shadow-2xs">
+                            <span className="text-xl font-bold text-[#17202D] block">
+                                {kenshi.rank?.is_dan ? 'Yudansha' : 'Mudansha'}
                             </span>
-                            <span className="text-[11px] text-slate-500">Kategori Tingkat</span>
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#718092]">Kategori Tingkat</span>
                         </div>
-                        <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-xs">
-                            <span className="text-xl font-bold text-emerald-600 block">
+                        <div className="rounded-xl border border-[#E8EBEF] bg-white p-3.5 text-center shadow-2xs">
+                            <span className="text-xl font-bold text-[#16865C] block">
                                 94%
                             </span>
-                            <span className="text-[11px] text-slate-500">Presensi Latihan</span>
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#718092]">Presensi Latihan</span>
                         </div>
                     </div>
                 </div>
 
                 {/* UKT Progression Roadmap (Right Column) */}
                 <div className="lg:col-span-7 space-y-6">
-                    <Card>
+                    <Card className="border border-[#E8EBEF] bg-white shadow-2xs">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Award className="w-5 h-5 text-red-600" />
+                            <CardTitle className="flex items-center gap-2 text-base font-bold text-[#17202D]">
+                                <Award className="w-5 h-5 text-[#C51C2A]" />
                                 Peta Kemajuan Tingkatan (UKT Roadmap)
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-[#718092]">
                                 Jalur kurikulum Shorinji Kempo dari sabuk putih (Minarai) hingga pemegang tingkatan Dan (Yudansha).
                             </p>
 
-                            <div className="relative pl-6 space-y-5 border-l-2 border-slate-200 ml-2">
+                            <div className="relative pl-6 space-y-5 border-l-2 border-[#E8EBEF] ml-2">
                                 {roadmap.map((step, index) => {
                                     return (
                                         <div key={step.rank} className="relative flex items-start gap-4">
@@ -100,10 +100,10 @@ export default function KenshiPortal({ kenshi: rawKenshi, roadmap, cardSecurityH
                                             <div
                                                 className={`absolute -left-[31px] top-0 flex h-6 w-6 items-center justify-center rounded-full border-2 bg-white ${
                                                     step.is_completed
-                                                        ? 'border-emerald-600 text-emerald-600'
+                                                        ? 'border-[#16865C] text-[#16865C]'
                                                         : step.is_current
-                                                        ? 'border-red-600 bg-red-600 text-white shadow-xs animate-pulse'
-                                                        : 'border-slate-300 text-slate-400'
+                                                        ? 'border-[#C51C2A] bg-[#C51C2A] text-white shadow-2xs'
+                                                        : 'border-[#E8EBEF] text-[#718092]'
                                                 }`}
                                             >
                                                 {step.is_completed ? (
@@ -121,10 +121,10 @@ export default function KenshiPortal({ kenshi: rawKenshi, roadmap, cardSecurityH
                                                     <span
                                                         className={`text-sm font-bold ${
                                                             step.is_current
-                                                                ? 'text-red-600 font-extrabold'
+                                                                ? 'text-[#C51C2A]'
                                                                 : step.is_completed
-                                                                ? 'text-slate-800'
-                                                                : 'text-slate-400'
+                                                                ? 'text-[#17202D]'
+                                                                : 'text-[#718092]'
                                                         }`}
                                                     >
                                                         {step.label}
@@ -135,13 +135,13 @@ export default function KenshiPortal({ kenshi: rawKenshi, roadmap, cardSecurityH
                                                         </Badge>
                                                     )}
                                                     {step.is_completed && (
-                                                        <span className="text-[11px] text-emerald-600 font-medium">
+                                                        <span className="text-[11px] text-[#16865C] font-semibold">
                                                             ✓ Lulus Ujian
                                                         </span>
                                                     )}
                                                 </div>
-                                                <span className="text-xs text-slate-500 block">
-                                                    Warna Sabuk: <strong className="capitalize">{step.belt_color}</strong>
+                                                <span className="text-xs text-[#718092] block mt-0.5">
+                                                    Warna Sabuk: <strong className="capitalize text-[#17202D]">{step.belt_color}</strong>
                                                 </span>
                                             </div>
                                         </div>
@@ -152,67 +152,64 @@ export default function KenshiPortal({ kenshi: rawKenshi, roadmap, cardSecurityH
                     </Card>
 
                     {/* Presensi Kamera & Geotag GPS Live Card */}
-                    <div className="relative overflow-hidden rounded-2xl border border-red-500/30 bg-gradient-to-r from-[#0B132B] via-slate-900 to-[#1A1024] p-5 sm:p-6 text-white shadow-lg">
-                        {/* Decorative background glow */}
-                        <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-red-600/15 blur-3xl" />
-                        <div className="pointer-events-none absolute -left-12 -bottom-12 h-36 w-36 rounded-full bg-purple-600/10 blur-2xl" />
-
-                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-                            <div className="flex items-start gap-4">
-                                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center text-white shrink-0 shadow-md shadow-red-950/40 mt-0.5">
-                                    <Camera className="w-6 h-6" />
-                                </div>
-                                <div className="space-y-1.5 max-w-xl">
-                                    <div className="flex flex-wrap items-center gap-2.5">
-                                        <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
-                                            Presensi Latihan Mandiri (Kamera & GPS)
-                                        </h4>
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-2xs font-semibold bg-red-500/20 text-red-300 border border-red-500/40 whitespace-nowrap">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse shrink-0" />
-                                            Live Tatami
-                                        </span>
+                    <Card className="border border-[#E8EBEF] bg-white shadow-2xs">
+                        <CardContent className="p-5 sm:p-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                                <div className="flex items-start gap-4">
+                                    <div className="h-11 w-11 rounded-xl bg-[#F8F9FA] border border-[#E8EBEF] flex items-center justify-center text-[#C51C2A] shrink-0 mt-0.5">
+                                        <Camera className="w-5 h-5" />
                                     </div>
-                                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                                        Lakukan absensi selfie dengan dogi lengkap saat berada di dojo untuk meningkatkan persentase kehadiran syarat UKT Anda.
-                                    </p>
+                                    <div className="space-y-1 max-w-xl">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <h4 className="text-sm sm:text-base font-bold text-[#17202D]">
+                                                Presensi Latihan Mandiri (Kamera & GPS)
+                                            </h4>
+                                            <Badge variant="rose" size="sm" withDot>
+                                                Live Tatami
+                                            </Badge>
+                                        </div>
+                                        <p className="text-xs text-[#718092] leading-relaxed">
+                                            Lakukan absensi mandiri dengan foto berseragam Dogi lengkap saat berada di radius dojo untuk memenuhi syarat presensi UKT.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="shrink-0 flex items-center">
+                                    <Link href="/attendance/check-in" className="w-full sm:w-auto">
+                                        <Button
+                                            variant="danger"
+                                            className="w-full sm:w-auto bg-[#C51C2A] hover:bg-[#a51522] text-white font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-lg shadow-2xs whitespace-nowrap"
+                                            leftIcon={<Camera className="w-4 h-4" />}
+                                        >
+                                            Buka Kamera Presensi
+                                        </Button>
+                                    </Link>
                                 </div>
                             </div>
-
-                            <div className="shrink-0 flex items-center">
-                                <Link href="/attendance/check-in" className="w-full sm:w-auto">
-                                    <Button
-                                        variant="primary"
-                                        className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-xs sm:text-sm py-2.5 px-5 rounded-xl shadow-md shadow-red-950/40 whitespace-nowrap transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                                        leftIcon={<Camera className="w-4 h-4" />}
-                                    >
-                                        Buka Kamera Presensi
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
 
                     {/* Training Schedule & Dojo Contact */}
-                    <Card>
+                    <Card className="border border-[#E8EBEF] bg-white shadow-2xs">
                         <CardHeader>
                             <div className="flex items-center justify-between">
-                                <CardTitle className="text-sm">Informasi Dojo & Kalender Jadwal</CardTitle>
-                                <Link href="/schedules" className="text-xs text-red-600 hover:underline font-semibold">
+                                <CardTitle className="text-base font-bold text-[#17202D]">Informasi Dojo & Kalender Jadwal</CardTitle>
+                                <Link href="/schedules" className="text-xs text-[#C51C2A] hover:underline font-semibold">
                                     Lihat Kalender Lengkap →
                                 </Link>
                             </div>
                         </CardHeader>
-                        <CardContent className="space-y-3 text-xs text-slate-600">
+                        <CardContent className="space-y-3 text-xs text-[#718092]">
                             <div className="flex items-center gap-3">
-                                <Calendar className="w-4 h-4 text-red-600 shrink-0" />
+                                <Calendar className="w-4 h-4 text-[#C51C2A] shrink-0" />
                                 <span>
-                                    Hari Latihan: <strong>Selasa & Kamis (19.00 - 21.00), Sabtu (08.00 - 11.00)</strong>
+                                    Hari Latihan: <strong className="text-[#17202D]">Selasa & Kamis (19.00 - 21.00), Sabtu (08.00 - 11.00)</strong>
                                 </span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Shield className="w-4 h-4 text-amber-500 shrink-0" />
+                                <Shield className="w-4 h-4 text-[#102B40] shrink-0" />
                                 <span>
-                                    Dojo Terdaftar: <strong>{kenshi.dojo?.name || 'Dojo Senayan'}</strong> ({kenshi.dojo?.pengprov})
+                                    Dojo Terdaftar: <strong className="text-[#17202D]">{kenshi.dojo?.name || 'Dojo Senayan'}</strong> ({kenshi.dojo?.pengprov})
                                 </span>
                             </div>
                         </CardContent>

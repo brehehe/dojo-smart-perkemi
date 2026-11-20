@@ -8,6 +8,7 @@ use App\Enums\DojoStatus;
 use App\Enums\KenshiRank;
 use App\Models\Dojo;
 use App\Models\Kenshi;
+use App\Models\Pengurus;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -205,7 +206,7 @@ class KenshiManagementTest extends TestCase
             'status' => DojoStatus::Active,
         ]);
 
-        $pengkot = \App\Models\Pengurus::create([
+        $pengkot = Pengurus::create([
             'type' => 'pengkot',
             'name' => 'Pengkot PERKEMI Surabaya',
             'code' => 'PK-SBY-99',

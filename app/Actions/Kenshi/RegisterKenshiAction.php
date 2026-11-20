@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Kenshi;
 
 use App\Models\Kenshi;
+use App\Models\Pengurus;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -54,7 +55,7 @@ class RegisterKenshiAction
                 $data['pengkot_id'] = null;
                 $data['pengkot'] = null;
             } elseif (empty($data['pengkot']) && ! empty($data['pengkot_id'])) {
-                $pengkot = \App\Models\Pengurus::find($data['pengkot_id']);
+                $pengkot = Pengurus::find($data['pengkot_id']);
                 $data['pengkot'] = $pengkot?->region ?? $pengkot?->name;
             }
 
@@ -64,7 +65,7 @@ class RegisterKenshiAction
                 $data['pengprov_id'] = null;
                 $data['pengprov'] = null;
             } elseif (empty($data['pengprov']) && ! empty($data['pengprov_id'])) {
-                $pengprov = \App\Models\Pengurus::find($data['pengprov_id']);
+                $pengprov = Pengurus::find($data['pengprov_id']);
                 $data['pengprov'] = $pengprov?->region ?? $pengprov?->name;
             }
 

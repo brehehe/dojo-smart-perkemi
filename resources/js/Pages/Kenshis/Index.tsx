@@ -26,9 +26,11 @@ import { RankBadge } from '@/Components/UI/DataDisplay/RankBadge';
 import { Avatar } from '@/Components/UI/Elements/Avatar';
 import {
     Award,
+    CheckCircle2,
     Download,
     Edit3,
     FileSpreadsheet,
+    GraduationCap,
     Plus,
     Search,
     Shield,
@@ -50,10 +52,17 @@ interface Props {
     dojos?: Dojo[];
     ranks: Array<{ value: string; label: string }>;
     pageTitle?: string;
+    pageSubtitle?: string;
     isCoachOnly?: boolean;
+    stats?: {
+        total_kenshi: number;
+        total_coach: number;
+        active_count: number;
+        total_yudansha: number;
+    };
 }
 
-export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle, isCoachOnly }: Props) {
+export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle, pageSubtitle, isCoachOnly, stats }: Props) {
     const { auth } = usePage<PageProps>().props;
     const isSuperAdmin = auth.user?.roles?.includes('SuperAdmin');
     const isPengprovAdmin = auth.user?.roles?.includes('PengprovAdmin');
@@ -64,7 +73,7 @@ export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle
 
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [rankFilter, setRankFilter] = useState(filters.rank || '');
-    const [memberTypeFilter, setMemberTypeFilter] = useState(filters.member_type || (isCoachOnly ? 'coach' : ''));
+    const [memberTypeFilter, setMemberTypeFilter] = useState(filters.member_type || (isCoachOnly ? 'coach' : 'athlete'));
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isImporting, setIsImporting] = useState(false);
@@ -129,31 +138,30 @@ export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle
     }).toString()}`;
 
     const totalCount = kenshis.meta?.total ?? kenshis.total ?? kenshis.data.length;
-    const coachCount = kenshis.data.filter((k) => k.member_type === 'coach').length;
     const yudanshaCount = kenshis.data.filter((k) => k.rank?.is_dan).length;
 
     return (
         <AppLayout>
-            <Head title={pageTitle ? `${pageTitle} - Perkemi` : "Direktori Kenshi & Pelatih - Perkemi"} />
+            <Head title={pageTitle ? `${pageTitle} - Perkemi` : (isCoachOnly ? "Pangkalan Data Pelatih & Sensei - Perkemi" : "Pangkalan Data Kenshi - Perkemi")} />
 
             <PageHeading
-                title={pageTitle || "Pangkalan Data Kenshi & Pelatih"}
+                title={pageTitle || (isCoachOnly ? "Pangkalan Data Pelatih & Sensei" : "Pangkalan Data Kenshi")}
                 description={
-                    isCoachOnly
+                    pageSubtitle || (isCoachOnly
                         ? "Direktori resmi pelatih, instruktur Yudansha, dan Sensei Dojo PB Perkemi se-Indonesia."
-                        : "Registrasi kenshi dan pelatih terpusat nasional, pencatatan tingkatan (Kyu/Dan), import/export Excel, dan akun KTA digital."
+                        : "Registrasi dan direktori kenshi atlet terpusat nasional, pencatatan tingkatan (Kyu/Dan), import/export Excel, dan KTA digital.")
                 }
                 actions={
                     <ActionMenuDropdown
-                        triggerLabel="Kelola & Aksi Pangkalan"
+                        triggerLabel={isCoachOnly ? "Kelola & Aksi Pelatih" : "Kelola & Aksi Kenshi"}
                         size="md"
                         align="right"
                         buttonClassName="bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 px-3.5 py-2 rounded-xl text-xs font-bold shadow-xs flex items-center gap-2"
                         items={[
                             {
-                                label: 'Registrasi Anggota Baru',
+                                label: isCoachOnly ? 'Registrasi Pelatih Baru' : 'Registrasi Kenshi Baru',
                                 icon: Plus,
-                                href: '/kenshis/create',
+                                href: isCoachOnly ? '/kenshis/create?type=coach' : '/kenshis/create',
                                 show: canKenshiCreate,
                             },
                             {
@@ -174,25 +182,59 @@ export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle
                 }
             />
 
+            {/* Dedicated Mode / Role Tabs (Kenshi vs Pelatih) */}
+            <div className="flex items-center gap-2 border-b border-slate-200 mb-6">
+                <Link
+                    href="/kenshis"
+                    className={cn(
+                        'px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 cursor-pointer',
+                        !isCoachOnly
+                            ? 'border-[#102B40] text-[#102B40]'
+                            : 'border-transparent text-slate-500 hover:text-slate-800'
+                    )}
+                >
+                    <Users className="w-4 h-4" />
+                    <span>Anggota & Atlet Kenshi</span>
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold">
+                        {stats?.total_kenshi ?? (isCoachOnly ? 0 : totalCount)}
+                    </span>
+                </Link>
+                <Link
+                    href="/coaches"
+                    className={cn(
+                        'px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 cursor-pointer',
+                        isCoachOnly
+                            ? 'border-[#102B40] text-[#102B40]'
+                            : 'border-transparent text-slate-500 hover:text-slate-800'
+                    )}
+                >
+                    <GraduationCap className="w-4 h-4" />
+                    <span>Pelatih & Sensei Dojo</span>
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold">
+                        {stats?.total_coach ?? (isCoachOnly ? totalCount : 0)}
+                    </span>
+                </Link>
+            </div>
+
             {/* Quick Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <StatsCard
-                    title="Total Anggota Terdaftar"
-                    value={totalCount}
-                    description="Kenshi & Pelatih terverifikasi di pangkalan data"
-                    icon={<Users className="w-5 h-5 text-red-600" />}
+                    title={isCoachOnly ? "Total Pelatih & Sensei" : "Total Anggota Kenshi"}
+                    value={isCoachOnly ? (stats?.total_coach ?? totalCount) : (stats?.total_kenshi ?? totalCount)}
+                    description={isCoachOnly ? "Instruktur dan Sensei terdaftar nasional" : "Kenshi & atlet terverifikasi di pangkalan data"}
+                    icon={isCoachOnly ? <GraduationCap className="w-5 h-5 text-amber-600" /> : <Users className="w-5 h-5 text-red-600" />}
                 />
                 <StatsCard
-                    title="Pelatih & Sensei Dojo"
-                    value={coachCount}
-                    description="Instruktur bersertifikasi dan kepala dojo"
-                    icon={<Award className="w-5 h-5 text-amber-500" />}
+                    title={isCoachOnly ? "Pelatih Aktif Dojo" : "Kenshi Aktif Berlatih"}
+                    value={stats?.active_count ?? totalCount}
+                    description={isCoachOnly ? "Aktif membina latihan dojo cabang" : "Keanggotaan aktif semester berjalan"}
+                    icon={<Award className="w-5 h-5 text-emerald-600" />}
                 />
                 <StatsCard
-                    title="Pemegang Sabuk Hitam (Yudansha)"
-                    value={yudanshaCount}
-                    description="Tingkatan I Dan hingga V Dan aktif"
-                    icon={<Shield className="w-5 h-5 text-indigo-600" />}
+                    title={isCoachOnly ? "Sensei Yudansha" : "Pemegang Sabuk Hitam (Yudansha)"}
+                    value={stats?.total_yudansha ?? yudanshaCount}
+                    description={isCoachOnly ? "Instruktur tingkatan I Dan ke atas" : "Atlet tingkatan I Dan hingga V Dan"}
+                    icon={<Shield className="w-5 h-5 text-[#102B40]" />}
                 />
             </div>
 
@@ -201,25 +243,26 @@ export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle
                 <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
                     <div className="flex-1">
                         <Input
-                            placeholder="Cari nama kenshi/pelatih, nomor induk (NIK), atau telepon..."
+                            placeholder={isCoachOnly ? "Cari nama pelatih, nomor induk (NIK), atau telepon..." : "Cari nama kenshi/atlet, nomor induk (NIK), atau telepon..."}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             leftIcon={<Search className="w-4 h-4" />}
                         />
                     </div>
-                    <div className="w-full sm:w-52">
-                        <SelectSearch
-                            value={memberTypeFilter}
-                            onChange={(val) => handleMemberTypeChange(val)}
-                            options={[
-                                { value: '', label: 'Semua Kategori' },
-                                { value: 'athlete', label: 'Atlet / Kenshi' },
-                                { value: 'coach', label: 'Pelatih / Sensei' },
-                            ]}
-                            placeholder="Semua Kategori"
-                            searchPlaceholder="Cari kategori..."
-                        />
-                    </div>
+                    {!isCoachOnly && (
+                        <div className="w-full sm:w-52">
+                            <SelectSearch
+                                value={memberTypeFilter}
+                                onChange={(val) => handleMemberTypeChange(val)}
+                                options={[
+                                    { value: 'athlete', label: 'Semua Kenshi & Atlet' },
+                                    { value: 'all', label: 'Semua Status Anggota' },
+                                ]}
+                                placeholder="Status Kenshi"
+                                searchPlaceholder="Cari status..."
+                            />
+                        </div>
+                    )}
                     <div className="w-full sm:w-56">
                         <SelectSearch
                             value={rankFilter}
@@ -238,7 +281,7 @@ export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle
                 </form>
             </div>
 
-            {/* Kenshi Display: Desktop Table + Mobile Cards */}
+            {/* Kenshi / Coach Display: Desktop Table + Mobile Cards */}
             {kenshis.data.length > 0 ? (
                 <>
                     {/* Desktop & Tablet Table */}
@@ -246,9 +289,9 @@ export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Kenshi / Pelatih</TableHead>
+                                    <TableHead>{isCoachOnly ? 'Pelatih & Sensei' : 'Kenshi / Atlet'}</TableHead>
                                     <TableHead>Nomor Induk (NIK)</TableHead>
-                                    <TableHead>Kategori</TableHead>
+                                    <TableHead>{isCoachOnly ? 'Penugasan Pelatih' : 'Peran & Wilayah'}</TableHead>
                                     <TableHead>Dojo Asal</TableHead>
                                     <TableHead>Tingkatan (Rank)</TableHead>
                                     <TableHead>Akun Login</TableHead>
@@ -257,201 +300,226 @@ export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {kenshis.data.map((kenshi) => (
-                                    <TableRow key={kenshi.id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <Avatar name={kenshi.full_name} size="sm" />
-                                                <div>
-                                                    <Link
-                                                        href={`/kenshis/${kenshi.id}`}
-                                                        className="font-bold text-slate-900 block leading-tight hover:text-red-600 transition-colors"
-                                                    >
-                                                        {kenshi.full_name}
-                                                    </Link>
-                                                    <span className="text-xs text-slate-500">
-                                                        {kenshi.gender === 'M' ? 'Putra' : 'Putri'}
-                                                        {kenshi.blood_type ? ` · Gol. ${kenshi.blood_type}` : ''}
+                                {kenshis.data.map((kenshi) => {
+                                    const isCoach = kenshi.member_type === 'coach';
+                                    const roleTitle = isCoach
+                                        ? 'Pelatih & Sensei Dojo'
+                                        : kenshi.is_atlet_pengprov && kenshi.is_atlet_pengkot
+                                          ? 'Atlet Puslatda & Puslatcab'
+                                          : kenshi.is_atlet_pengprov
+                                            ? 'Atlet Pengprov'
+                                            : kenshi.is_atlet_pengkot
+                                              ? 'Atlet Pengkot'
+                                              : 'Anggota Kenshi';
+
+                                    const roleSubtitle = isCoach
+                                        ? (kenshi.dojo?.name || 'Instruktur PB Perkemi')
+                                        : kenshi.is_atlet_pengprov && kenshi.is_atlet_pengkot
+                                          ? `${kenshi.pengprov || 'Pengprov'} · ${kenshi.pengkot || 'Pengkot'}`
+                                          : kenshi.is_atlet_pengprov
+                                            ? (kenshi.pengprov || 'Jawa Timur')
+                                            : kenshi.is_atlet_pengkot
+                                              ? (kenshi.pengkot || 'Kota Surabaya')
+                                              : (kenshi.dojo?.name || 'Dojo Cabang');
+
+                                    return (
+                                        <TableRow key={kenshi.id}>
+                                            <TableCell>
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar name={kenshi.full_name} size="sm" />
+                                                    <div className="min-w-0">
+                                                        <Link
+                                                            href={`/kenshis/${kenshi.id}`}
+                                                            className="font-bold text-slate-900 block leading-tight hover:text-[#C51C2A] transition-colors truncate max-w-[200px]"
+                                                        >
+                                                            {kenshi.full_name}
+                                                        </Link>
+                                                        <span className="text-xs text-slate-500">
+                                                            {kenshi.gender === 'M' ? 'Putra' : 'Putri'}
+                                                            {kenshi.blood_type ? ` · Gol. ${kenshi.blood_type}` : ''}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <span className="font-mono text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200/60">
+                                                    {kenshi.id_card_number}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="text-xs">
+                                                    <span className="font-semibold text-slate-800 block">
+                                                        {roleTitle}
+                                                    </span>
+                                                    <span className="text-[11px] text-slate-500">
+                                                        {roleSubtitle}
                                                     </span>
                                                 </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="font-mono text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-                                                {kenshi.id_card_number}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col gap-1 items-start">
-                                                <Badge
-                                                    variant={kenshi.member_type === 'coach' ? 'amber' : 'slate'}
-                                                    className="text-[11px]"
-                                                >
-                                                    {kenshi.member_type === 'coach' ? 'Pelatih' : 'Atlet'}
-                                                </Badge>
-                                                {kenshi.is_atlet_pengkot && (
-                                                    <span className="inline-flex items-center gap-1 rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-bold text-rose-700 border border-rose-200">
-                                                        Pengkot {kenshi.pengkot ? `(${kenshi.pengkot})` : ''}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="text-xs">
+                                                    <span className="font-medium text-slate-800 block truncate max-w-[180px]">
+                                                        {kenshi.dojo?.name || '-'}
                                                     </span>
-                                                )}
-                                                {kenshi.is_atlet_pengprov && (
-                                                    <span className="inline-flex items-center gap-1 rounded bg-purple-50 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200">
-                                                        Pengprov {kenshi.pengprov ? `(${kenshi.pengprov})` : ''}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="text-xs">
-                                                <span className="font-medium text-slate-800 block">
-                                                    {kenshi.dojo?.name || '-'}
-                                                </span>
-                                                <span className="text-slate-500">{kenshi.dojo?.pengprov}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <RankBadge
-                                                label={kenshi.rank.label}
-                                                beltColor={kenshi.rank.belt_color}
-                                                isDan={kenshi.rank.is_dan}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="text-xs font-mono text-slate-600">
-                                                {kenshi.user?.email ? (
-                                                    <span className="text-emerald-700 font-medium">
-                                                        {kenshi.user.email}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-slate-400">Belum ada akun</span>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                variant={kenshi.is_active ? 'emerald' : 'slate'}
-                                                withDot
-                                            >
-                                                {kenshi.is_active ? 'Aktif' : 'Non-Aktif'}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-right whitespace-nowrap w-14">
-                                            <div className="flex items-center justify-end">
-                                                <ActionMenuDropdown
-                                                    title={`Aksi Kenshi ${kenshi.full_name}`}
-                                                    items={[
-                                                        {
-                                                            label: 'Profil Lengkap',
-                                                            href: `/kenshis/${kenshi.id}`,
-                                                            icon: User,
-                                                        },
-                                                        {
-                                                            label: 'Kartu Tanda Anggota (KTA)',
-                                                            href: `/kenshis/${kenshi.id}`,
-                                                            icon: Award,
-                                                        },
-                                                        {
-                                                            label: 'Ubah Data Kenshi',
-                                                            href: `/kenshis/${kenshi.id}/edit`,
-                                                            icon: Edit3,
-                                                            show: canKenshiCreate,
-                                                        },
-                                                    ]}
+                                                    <span className="text-slate-500">{kenshi.dojo?.pengprov || '-'}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <RankBadge
+                                                    label={kenshi.rank.label}
+                                                    beltColor={kenshi.rank.belt_color}
+                                                    isDan={kenshi.rank.is_dan}
                                                 />
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                            </TableCell>
+                                            <TableCell>
+                                                {kenshi.user?.email ? (
+                                                    <div className="flex items-center gap-1.5 text-xs text-slate-700 font-mono">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                                        <span className="truncate max-w-[140px]" title={kenshi.user.email}>
+                                                            {kenshi.user.email}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-slate-400">Belum terhubung</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <span className="inline-flex items-center gap-1.5 text-xs font-semibold">
+                                                    <span className={cn('w-2 h-2 rounded-full', kenshi.is_active ? 'bg-emerald-500' : 'bg-slate-400')} />
+                                                    <span className={kenshi.is_active ? 'text-emerald-700' : 'text-slate-500'}>
+                                                        {kenshi.is_active ? 'Aktif' : 'Non-Aktif'}
+                                                    </span>
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className="text-right whitespace-nowrap w-14">
+                                                <div className="flex items-center justify-end">
+                                                    <ActionMenuDropdown
+                                                        title={`Aksi ${kenshi.full_name}`}
+                                                        items={[
+                                                            {
+                                                                label: 'Profil Lengkap',
+                                                                href: `/kenshis/${kenshi.id}`,
+                                                                icon: User,
+                                                            },
+                                                            {
+                                                                label: 'Kartu Tanda Anggota (KTA)',
+                                                                href: `/kenshis/${kenshi.id}`,
+                                                                icon: Award,
+                                                            },
+                                                            {
+                                                                label: 'Ubah Data',
+                                                                href: `/kenshis/${kenshi.id}/edit`,
+                                                                icon: Edit3,
+                                                                show: canKenshiCreate,
+                                                            },
+                                                        ]}
+                                                    />
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </div>
 
                     {/* Mobile Cards */}
                     <div className="block md:hidden space-y-3">
-                        {kenshis.data.map((kenshi) => (
-                            <div
-                                key={kenshi.id}
-                                className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs"
-                            >
-                                <div className="flex items-start justify-between gap-2.5 mb-2.5">
-                                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                                        <Avatar name={kenshi.full_name} size="sm" />
-                                        <div className="min-w-0 flex-1">
-                                            <Link
-                                                href={`/kenshis/${kenshi.id}`}
-                                                className="font-bold text-slate-900 text-sm block truncate hover:text-red-600 transition-colors"
-                                            >
-                                                {kenshi.full_name}
-                                            </Link>
-                                            <span className="text-[11px] font-mono text-slate-500 block">
-                                                {kenshi.id_card_number}
+                        {kenshis.data.map((kenshi) => {
+                            const isCoach = kenshi.member_type === 'coach';
+                            const roleTitle = isCoach
+                                ? 'Pelatih & Sensei Dojo'
+                                : kenshi.is_atlet_pengprov && kenshi.is_atlet_pengkot
+                                  ? 'Atlet Puslatda & Puslatcab'
+                                  : kenshi.is_atlet_pengprov
+                                    ? 'Atlet Pengprov'
+                                    : kenshi.is_atlet_pengkot
+                                      ? 'Atlet Pengkot'
+                                      : 'Anggota Kenshi';
+
+                            return (
+                                <div
+                                    key={kenshi.id}
+                                    className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs"
+                                >
+                                    <div className="flex items-start justify-between gap-2.5 mb-2.5">
+                                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                            <Avatar name={kenshi.full_name} size="sm" />
+                                            <div className="min-w-0 flex-1">
+                                                <Link
+                                                    href={`/kenshis/${kenshi.id}`}
+                                                    className="font-bold text-slate-900 text-sm block truncate hover:text-[#C51C2A] transition-colors"
+                                                >
+                                                    {kenshi.full_name}
+                                                </Link>
+                                                <span className="text-[11px] font-mono text-slate-500 block">
+                                                    {kenshi.id_card_number}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            <ActionMenuDropdown
+                                                title={`Aksi ${kenshi.full_name}`}
+                                                items={[
+                                                    {
+                                                        label: 'Profil Lengkap',
+                                                        href: `/kenshis/${kenshi.id}`,
+                                                        icon: User,
+                                                    },
+                                                    {
+                                                        label: 'Kartu Tanda Anggota (KTA)',
+                                                        href: `/kenshis/${kenshi.id}`,
+                                                        icon: Award,
+                                                    },
+                                                    {
+                                                        label: 'Ubah Data',
+                                                        href: `/kenshis/${kenshi.id}/edit`,
+                                                        icon: Edit3,
+                                                        show: canKenshiCreate,
+                                                    },
+                                                ]}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5 text-xs text-slate-600 mb-3 pt-2 border-t border-slate-100">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-slate-400">Peran:</span>
+                                            <span className="font-semibold text-slate-800">{roleTitle}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-slate-400">Tingkatan:</span>
+                                            <RankBadge
+                                                label={kenshi.rank.label}
+                                                beltColor={kenshi.rank.belt_color}
+                                                isDan={kenshi.rank.is_dan}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-slate-400">Dojo:</span>
+                                            <span className="font-medium text-slate-800 break-words text-right">
+                                                {kenshi.dojo?.name || '-'}
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                        <Badge
-                                            variant={kenshi.member_type === 'coach' ? 'amber' : 'slate'}
-                                            className="text-[11px]"
-                                        >
-                                            {kenshi.member_type === 'coach' ? 'Pelatih' : 'Atlet'}
-                                        </Badge>
-                                        <ActionMenuDropdown
-                                            title={`Aksi Kenshi ${kenshi.full_name}`}
-                                            items={[
-                                                {
-                                                    label: 'Profil Lengkap',
-                                                    href: `/kenshis/${kenshi.id}`,
-                                                    icon: User,
-                                                },
-                                                {
-                                                    label: 'Kartu Tanda Anggota (KTA)',
-                                                    href: `/kenshis/${kenshi.id}`,
-                                                    icon: Award,
-                                                },
-                                                {
-                                                    label: 'Ubah Data Kenshi',
-                                                    href: `/kenshis/${kenshi.id}/edit`,
-                                                    icon: Edit3,
-                                                    show: canKenshiCreate,
-                                                },
-                                            ]}
-                                        />
-                                    </div>
-                                </div>
 
-                                <div className="space-y-1.5 text-xs text-slate-600 mb-3 pt-2 border-t border-slate-100">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-slate-400">Tingkatan:</span>
-                                        <RankBadge
-                                            label={kenshi.rank.label}
-                                            beltColor={kenshi.rank.belt_color}
-                                            isDan={kenshi.rank.is_dan}
-                                        />
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-slate-400">Dojo:</span>
-                                        <span className="font-medium text-slate-800 break-words text-right">
-                                            {kenshi.dojo?.name || '-'}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                                    <Link href={`/kenshis/${kenshi.id}`} className="flex-1">
-                                        <Button variant="secondary" size="sm" className="w-full text-xs">
-                                            Profil Kenshi
-                                        </Button>
-                                    </Link>
-                                    {canKenshiCreate && (
-                                        <Link href={`/kenshis/${kenshi.id}/edit`} className="flex-1">
-                                            <Button variant="outline" size="sm" className="w-full text-xs">
-                                                Edit Biodata
+                                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                                        <Link href={`/kenshis/${kenshi.id}`} className="flex-1">
+                                            <Button variant="secondary" size="sm" className="w-full text-xs">
+                                                Lihat Profil
                                             </Button>
                                         </Link>
-                                    )}
+                                        {canKenshiCreate && (
+                                            <Link href={`/kenshis/${kenshi.id}/edit`} className="flex-1">
+                                                <Button variant="outline" size="sm" className="w-full text-xs">
+                                                    Edit Biodata
+                                                </Button>
+                                            </Link>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     <Pagination
@@ -464,13 +532,13 @@ export default function KenshisIndex({ kenshis, filters, dojos, ranks, pageTitle
                 </>
             ) : (
                 <EmptyState
-                    title="Tidak Ada Kenshi Ditemukan"
-                    description="Belum ada data kenshi atau pelatih yang sesuai dengan pencarian Anda. Daftarkan baru atau gunakan fitur impor berkas Excel."
+                    title={isCoachOnly ? "Tidak Ada Pelatih Ditemukan" : "Tidak Ada Kenshi Ditemukan"}
+                    description={isCoachOnly ? "Belum ada data pelatih atau Sensei yang sesuai dengan filter pencarian Anda." : "Belum ada data kenshi atau atlet yang sesuai dengan filter pencarian Anda. Daftarkan baru atau gunakan fitur impor berkas Excel."}
                     action={
                         canKenshiCreate ? (
-                            <Link href="/kenshis/create">
+                            <Link href={isCoachOnly ? "/kenshis/create?type=coach" : "/kenshis/create"}>
                                 <Button variant="primary" leftIcon={<Plus className="w-4 h-4" />}>
-                                    Registrasi Kenshi Baru
+                                    {isCoachOnly ? "Registrasi Pelatih Baru" : "Registrasi Kenshi Baru"}
                                 </Button>
                             </Link>
                         ) : undefined

@@ -81,6 +81,30 @@ class Dojo extends Model
     }
 
     /**
+     * Fee configuration settings for this dojo.
+     */
+    public function feeSettings(): HasMany
+    {
+        return $this->hasMany(DojoFeeSetting::class);
+    }
+
+    /**
+     * Invoices issued for members of this dojo.
+     */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * Learning materials created by or hosted for this dojo.
+     */
+    public function materials(): HasMany
+    {
+        return $this->hasMany(Material::class);
+    }
+
+    /**
      * Scope to filter only active dojos.
      */
     public function scopeActive(Builder $query): Builder

@@ -245,4 +245,3 @@ class PengurusCsvSeeder extends Seeder
             ->update(['pengprov_id' => $pengprovOrg->id, 'pengprov' => 'Jawa Timur']);
     }
 }
-

@@ -185,4 +185,3 @@ class DojoCsvSeeder extends Seeder
         fclose($handle);
     }
 }
-

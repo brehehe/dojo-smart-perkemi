@@ -115,7 +115,7 @@ export default function DojosIndex({ dojos, filters }: Props) {
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="rounded-xl border border-slate-200 bg-white p-3.5 sm:p-4 mb-5 sm:mb-6 shadow-xs">
+            <div className="rounded-xl border border-[#E8EBEF] bg-white p-3.5 sm:p-4 mb-5 sm:mb-6 shadow-2xs">
                 <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
                     <div className="flex-1">
                         <Input

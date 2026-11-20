@@ -7,9 +7,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DojoController;
 use App\Http\Controllers\DojoDashboardController;
+use App\Http\Controllers\DojoFeeSettingController;
+use App\Http\Controllers\ExaminationController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\KenshiController;
 use App\Http\Controllers\KenshiPortalController;
+use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\ModuleHubController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PengurusController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TrainingScheduleController;
@@ -37,6 +42,7 @@ Route::middleware('guest')->group(function (): void {
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+Route::get('/logout-get', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Publicly viewable directory
 Route::get('/kenshis', [KenshiController::class, 'index'])->name('kenshis.index');
@@ -65,6 +71,32 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/reports/export', [ReportController::class, 'export'])->name('reports.export');
     Route::get('/reports/status/{exportId}', [ReportController::class, 'status'])->name('reports.status');
     Route::get('/reports/download/{exportId}', [ReportController::class, 'download'])->name('reports.download');
+
+    // Modul Materi Video & PDF Kurikulum
+    Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
+    Route::get('/materials/{material:slug}', [MaterialController::class, 'show'])->name('materials.show');
+    Route::post('/materials/{material}/toggle-complete', [MaterialController::class, 'toggleComplete'])->name('materials.toggle_complete');
+    Route::get('/dojo/materi', [MaterialController::class, 'dojoIndex'])->name('dojo.materials.index');
+    Route::post('/dojo/materi', [MaterialController::class, 'storeDojoMaterial'])->name('dojo.materials.store');
+    Route::get('/portal/kenshi/materi', [MaterialController::class, 'index'])->name('kenshis.materials');
+
+    // Modul Iuran PERKEMI & Pengaturan Tarif Dojo (SK No. 045/SK-PB/VII/2025)
+    Route::get('/dojo/settings/iuran', [DojoFeeSettingController::class, 'index'])->name('dojo.fee_settings.index');
+    Route::post('/dojo/settings/iuran', [DojoFeeSettingController::class, 'store'])->name('dojo.fee_settings.store');
+    Route::post('/pb/fee-settings/{setting}/approve', [DojoFeeSettingController::class, 'approve'])->name('pb.fee_settings.approve');
+    Route::post('/pb/fee-settings/{setting}/reject', [DojoFeeSettingController::class, 'reject'])->name('pb.fee_settings.reject');
+    Route::get('/dojo/iuran', [InvoiceController::class, 'dojoIndex'])->name('dojo.invoices.index');
+    Route::post('/dojo/invoices/generate', [InvoiceController::class, 'generateMonthly'])->name('dojo.invoices.generate');
+    Route::get('/portal/kenshi/iuran', [InvoiceController::class, 'kenshiPortal'])->name('kenshis.invoices');
+    Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+
+    // Modul Ujian Kenaikan Tingkat (UKT) & Lembar Skoring Digital
+    Route::get('/examinations', [ExaminationController::class, 'index'])->name('examinations.index');
+    Route::get('/examinations/{examination}', [ExaminationController::class, 'show'])->name('examinations.show');
+    Route::post('/examinations/{examination}/register', [ExaminationController::class, 'register'])->name('examinations.register');
+    Route::post('/examinations/scores', [ExaminationController::class, 'submitScore'])->name('examinations.scores.store');
+    Route::post('/examinations/registrations/{registration}/finalize', [ExaminationController::class, 'finalize'])->name('examinations.finalize');
+    Route::get('/portal/kenshi/ukt', [ExaminationController::class, 'kenshiPortal'])->name('kenshis.ukt');
 
     // Main Concept High-Performance & Scientific Modules
     Route::get('/performance/physical', [ModuleHubController::class, 'physicalPerformance'])->name('modules.physical');

@@ -9,7 +9,7 @@ export const Card: React.FC<CardProps> = ({ className, hoverable = false, childr
     return (
         <div
             className={cn(
-                'rounded-xl border border-slate-200 bg-white shadow-xs overflow-hidden',
+                'rounded-xl border border-[#E8EBEF] bg-white shadow-2xs overflow-hidden',
                 hoverable && 'transition-shadow duration-150 hover:shadow-md cursor-pointer',
                 className
             )}
@@ -26,7 +26,7 @@ export const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
     ...props
 }) => {
     return (
-        <div className={cn('border-b border-slate-100 px-6 py-4', className)} {...props}>
+        <div className={cn('border-b border-[#E8EBEF] px-5 py-4', className)} {...props}>
             {children}
         </div>
     );
@@ -38,7 +38,7 @@ export const CardTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
     ...props
 }) => {
     return (
-        <h3 className={cn('text-base font-bold text-slate-900', className)} {...props}>
+        <h3 className={cn('text-sm lg:text-base font-bold text-[#17202D]', className)} {...props}>
             {children}
         </h3>
     );
@@ -50,7 +50,7 @@ export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement
     ...props
 }) => {
     return (
-        <p className={cn('mt-0.5 text-xs text-slate-500', className)} {...props}>
+        <p className={cn('mt-0.5 text-xs text-[#718092]', className)} {...props}>
             {children}
         </p>
     );
@@ -62,7 +62,7 @@ export const CardContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
     ...props
 }) => {
     return (
-        <div className={cn('p-6', className)} {...props}>
+        <div className={cn('p-5', className)} {...props}>
             {children}
         </div>
     );
@@ -74,7 +74,7 @@ export const CardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
     ...props
 }) => {
     return (
-        <div className={cn('border-t border-slate-100 bg-slate-50/50 px-6 py-3', className)} {...props}>
+        <div className={cn('border-t border-[#E8EBEF] bg-[#F8F9FA]/70 px-5 py-3', className)} {...props}>
             {children}
         </div>
     );

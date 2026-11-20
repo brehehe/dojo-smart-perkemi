@@ -30,6 +30,9 @@ class KenshiController extends Controller
         $this->authorize('viewAny', Kenshi::class);
 
         $filters = $request->only(['search', 'rank', 'dojo_id', 'is_active', 'member_type']);
+        if (! isset($filters['member_type'])) {
+            $filters['member_type'] = 'athlete';
+        }
 
         $rankEnum = ! empty($filters['rank']) ? KenshiRank::tryFrom($filters['rank']) : null;
 
@@ -38,7 +41,7 @@ class KenshiController extends Controller
             ->search($filters['search'] ?? null)
             ->rank($rankEnum)
             ->byDojo($filters['dojo_id'] ?? null)
-            ->when(! empty($filters['member_type']), fn ($q) => $q->where('member_type', $filters['member_type']))
+            ->when(! empty($filters['member_type']) && $filters['member_type'] !== 'all', fn ($q) => $q->where('member_type', $filters['member_type']))
             ->when(isset($filters['is_active']) && $filters['is_active'] !== '', function ($q) use ($filters) {
                 return $q->where('is_active', filter_var($filters['is_active'], FILTER_VALIDATE_BOOLEAN));
             })
@@ -48,6 +51,11 @@ class KenshiController extends Controller
 
         $activeDojos = Dojo::active()->select('id', 'name', 'code', 'pengprov')->get();
 
+        $totalKenshi = Kenshi::where('member_type', 'athlete')->count();
+        $totalCoach = Kenshi::where('member_type', 'coach')->count();
+        $activeKenshi = Kenshi::where('member_type', 'athlete')->where('is_active', true)->count();
+        $yudanshaCount = Kenshi::where('member_type', 'athlete')->where('rank', 'like', 'dan_%')->count();
+
         return Inertia::render('Kenshis/Index', [
             'kenshis' => KenshiResource::collection($kenshis),
             'filters' => $filters,
@@ -56,6 +64,15 @@ class KenshiController extends Controller
                 'value' => $r->value,
                 'label' => $r->label(),
             ]),
+            'pageTitle' => 'Pangkalan Data Kenshi',
+            'pageSubtitle' => 'Registrasi dan direktori kenshi atlet terpusat nasional, pencatatan tingkatan (Kyu/Dan), import/export Excel, dan KTA digital.',
+            'isCoachOnly' => false,
+            'stats' => [
+                'total_kenshi' => $totalKenshi,
+                'total_coach' => $totalCoach,
+                'active_count' => $activeKenshi,
+                'total_yudansha' => $yudanshaCount,
+            ],
         ]);
     }
 
@@ -86,6 +103,11 @@ class KenshiController extends Controller
 
         $activeDojos = Dojo::active()->select('id', 'name', 'code', 'pengprov')->get();
 
+        $totalKenshi = Kenshi::where('member_type', 'athlete')->count();
+        $totalCoach = Kenshi::where('member_type', 'coach')->count();
+        $activeCoach = Kenshi::where('member_type', 'coach')->where('is_active', true)->count();
+        $yudanshaCoach = Kenshi::where('member_type', 'coach')->where('rank', 'like', 'dan_%')->count();
+
         return Inertia::render('Kenshis/Index', [
             'kenshis' => KenshiResource::collection($coaches),
             'filters' => $filters,
@@ -95,7 +117,14 @@ class KenshiController extends Controller
                 'label' => $r->label(),
             ]),
             'pageTitle' => 'Pangkalan Data Pelatih & Sensei',
+            'pageSubtitle' => 'Direktori resmi pelatih, instruktur bersertifikasi Yudansha, dan Sensei Dojo PB Perkemi se-Indonesia.',
             'isCoachOnly' => true,
+            'stats' => [
+                'total_kenshi' => $totalKenshi,
+                'total_coach' => $totalCoach,
+                'active_count' => $activeCoach,
+                'total_yudansha' => $yudanshaCoach,
+            ],
         ]);
     }
 

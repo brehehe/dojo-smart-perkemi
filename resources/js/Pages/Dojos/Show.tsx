@@ -83,7 +83,7 @@ export default function DojosShow({ dojo: rawDojo }: Props) {
                 <div className="lg:col-span-2 space-y-6">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
-                            <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-100">
+                            <CardTitle className="text-base font-bold text-[#17202D]">
                                 Profil Resmi Cabang Latihan
                             </CardTitle>
                             <Badge
@@ -94,63 +94,64 @@ export default function DojosShow({ dojo: rawDojo }: Props) {
                                           ? 'slate'
                                           : 'amber'
                                 }
+                                withDot
                             >
                                 {dojo.status.label}
                             </Badge>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
-                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                                <div className="p-3.5 rounded-lg border border-[#E8EBEF] bg-[#F8F9FA]">
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#718092] block mb-1">
                                         Nomor Registrasi / Kode Dojo
                                     </span>
-                                    <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
+                                    <span className="font-mono text-sm font-bold text-[#17202D]">
                                         {dojo.code}
                                     </span>
                                 </div>
 
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
-                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                                <div className="p-3.5 rounded-lg border border-[#E8EBEF] bg-[#F8F9FA]">
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#718092] block mb-1">
                                         Wilayah Pengprov / Pengkab
                                     </span>
-                                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                                    <span className="text-sm font-bold text-[#17202D]">
                                         {dojo.pengprov} • {dojo.pengkab}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
-                                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                            <div className="p-3.5 rounded-lg border border-[#E8EBEF] bg-[#F8F9FA]">
+                                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#718092] block mb-1">
                                     Alamat Fasilitas / Tempat Latihan
                                 </span>
                                 <div className="flex items-start gap-2 mt-1">
-                                    <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                                    <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    <MapPin className="w-4 h-4 text-[#718092] shrink-0 mt-0.5" />
+                                    <p className="text-xs text-[#17202D] leading-relaxed">
                                         {dojo.address || 'Alamat belum dilengkapi.'}
                                     </p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
-                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                                <div className="p-3.5 rounded-lg border border-[#E8EBEF] bg-[#F8F9FA]">
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#718092] block mb-1">
                                         Kontak WhatsApp
                                     </span>
                                     <div className="flex items-center gap-2 mt-1">
-                                        <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                                        <span className="text-xs font-medium text-slate-800 dark:text-slate-200">
+                                        <Phone className="w-4 h-4 text-[#718092] shrink-0" />
+                                        <span className="text-xs font-semibold text-[#17202D]">
                                             {dojo.contact_phone || '-'}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-900/50">
-                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                                <div className="p-3.5 rounded-lg border border-[#E8EBEF] bg-[#F8F9FA]">
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#718092] block mb-1">
                                         Email Dojo
                                     </span>
                                     <div className="flex items-center gap-2 mt-1">
-                                        <Mail className="w-4 h-4 text-slate-400 shrink-0" />
-                                        <span className="text-xs font-medium text-slate-800 dark:text-slate-200">
+                                        <Mail className="w-4 h-4 text-[#718092] shrink-0" />
+                                        <span className="text-xs font-semibold text-[#17202D]">
                                             {dojo.contact_email || '-'}
                                         </span>
                                     </div>
@@ -162,15 +163,15 @@ export default function DojosShow({ dojo: rawDojo }: Props) {
                     {/* Geolocation Map & Geofence Viewer */}
                     <Card>
                         <CardHeader>
-                            <div className="flex items-center gap-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-[#C51C2A] border border-red-100 shrink-0">
                                     <MapPin className="h-4 w-4" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-100">
-                                        Titik Lokasi & Radius Absensi Tatami
+                                    <CardTitle className="text-base font-bold text-[#17202D]">
+                                        Titik Lokasi &amp; Radius Absensi Tatami
                                     </CardTitle>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    <p className="text-xs text-[#718092]">
                                         Peta titik koordinat resmi dan batas geofence absensi kenshi di dojo ini.
                                     </p>
                                 </div>
@@ -194,26 +195,28 @@ export default function DojosShow({ dojo: rawDojo }: Props) {
                     {/* Head Sensei Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                                <GraduationCap className="w-4 h-4 text-red-600" />
+                            <CardTitle className="text-sm font-bold text-[#17202D] flex items-center gap-2">
+                                <GraduationCap className="w-4 h-4 text-[#C51C2A]" />
                                 Sensei Penanggung Jawab
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             {dojo.head_sensei ? (
-                                <div className="p-3 rounded-lg border border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/60">
-                                    <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                                <div className="p-3.5 rounded-lg border border-[#E8EBEF] bg-[#F8F9FA] space-y-1">
+                                    <p className="text-sm font-bold text-[#17202D]">
                                         {dojo.head_sensei.name}
                                     </p>
-                                    <p className="text-xs text-slate-500 mt-0.5">
+                                    <p className="text-xs text-[#718092]">
                                         {dojo.head_sensei.email}
                                     </p>
-                                    <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-900 text-amber-400">
-                                        Head Sensei
-                                    </span>
+                                    <div className="pt-2">
+                                        <Badge variant="navy" size="sm">
+                                            Head Sensei
+                                        </Badge>
+                                    </div>
                                 </div>
                             ) : (
-                                <p className="text-xs text-slate-400">
+                                <p className="text-xs text-[#718092]">
                                     Sensei penanggung jawab belum ditetapkan.
                                 </p>
                             )}
@@ -223,33 +226,33 @@ export default function DojosShow({ dojo: rawDojo }: Props) {
                     {/* Stats Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                                <Users className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                            <CardTitle className="text-sm font-bold text-[#17202D] flex items-center gap-2">
+                                <Users className="w-4 h-4 text-[#718092]" />
                                 Statistik Kenshi
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                            <div className="flex items-baseline justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60">
-                                <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                            <div className="flex items-baseline justify-between p-3.5 rounded-lg border border-[#E8EBEF] bg-[#F8F9FA]">
+                                <span className="text-xs text-[#718092] font-medium">
                                     Kenshi Terdaftar Aktif
                                 </span>
-                                <span className="text-xl font-extrabold text-slate-900 dark:text-slate-100">
+                                <span className="text-xl font-extrabold text-[#17202D] font-mono tracking-tight">
                                     {dojo.kenshis_count ?? 0}
                                 </span>
                             </div>
 
-                            <div className="flex items-baseline justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60">
-                                <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                            <div className="flex items-baseline justify-between p-3.5 rounded-lg border border-[#E8EBEF] bg-[#F8F9FA]">
+                                <span className="text-xs text-[#718092] font-medium">
                                     Radius Presensi
                                 </span>
-                                <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                                <span className="text-sm font-bold text-[#102B40] font-mono">
                                     {radius} Meter
                                 </span>
                             </div>
 
-                            <Link href="/my-dojo" className="block w-full">
-                                <Button variant="secondary" size="sm" className="w-full">
-                                    Buka Evaluasi & UKT Roster
+                            <Link href="/my-dojo" className="block w-full pt-1">
+                                <Button variant="outline" size="sm" className="w-full">
+                                    Buka Evaluasi &amp; UKT Roster
                                 </Button>
                             </Link>
                         </CardContent>

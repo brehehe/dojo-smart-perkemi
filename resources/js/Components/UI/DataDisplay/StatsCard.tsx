@@ -26,25 +26,25 @@ export const StatsCard: React.FC<StatsCardProps> = ({
     return (
         <div
             className={cn(
-                'rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow',
+                'rounded-xl border border-[#E8EBEF] bg-white p-5 shadow-2xs transition-all hover:border-slate-300',
                 className
             )}
         >
             <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#718092]">{title}</p>
                 {icon && (
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-50 text-[#17202D]">
                         {icon}
                     </div>
                 )}
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-                <span className="text-2xl font-bold tracking-tight text-slate-900">{value}</span>
+                <span className="text-2xl lg:text-3xl font-extrabold font-mono tracking-tight text-[#17202D]">{value}</span>
                 {trend && (
                     <span
                         className={cn(
                             'inline-flex items-center text-xs font-semibold gap-0.5',
-                            trend.isPositive ? 'text-emerald-600' : 'text-rose-600'
+                            trend.isPositive ? 'text-[#16865C]' : 'text-[#DC3545]'
                         )}
                     >
                         {trend.isPositive ? (
@@ -57,7 +57,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
                 )}
             </div>
             {(description || trend?.label) && (
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-[#718092]">
                     {trend?.label ? `${trend.label} ` : ''}
                     {description}
                 </p>

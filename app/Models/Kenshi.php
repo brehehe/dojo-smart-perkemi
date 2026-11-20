@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\InvoiceStatus;
 use App\Enums\KenshiRank;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -145,6 +146,64 @@ class Kenshi extends Model
     public function coachEvaluations(): HasMany
     {
         return $this->hasMany(CoachEvaluation::class);
+    }
+
+    /**
+     * Dues invoices for this kenshi.
+     */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * Learning curriculum material progresses.
+     */
+    public function materialProgresses(): HasMany
+    {
+        return $this->hasMany(KenshiMaterialProgress::class);
+    }
+
+    /**
+     * Examination registrations (UKT).
+     */
+    public function examinationRegistrations(): HasMany
+    {
+        return $this->hasMany(ExaminationRegistration::class);
+    }
+
+    /**
+     * Rank promotion certificates & history.
+     */
+    public function promotions(): HasMany
+    {
+        return $this->hasMany(KenshiPromotion::class);
+    }
+
+    /**
+     * Status history records.
+     */
+    public function statusHistories(): HasMany
+    {
+        return $this->hasMany(KenshiStatusHistory::class);
+    }
+
+    /**
+     * Check if this kenshi has any unpaid dues.
+     */
+    public function hasUnpaidDues(): bool
+    {
+        return $this->invoices()->where('status', InvoiceStatus::Unpaid)->exists();
+    }
+
+    /**
+     * Check if kenshi is delinquent for 12 consecutive months.
+     */
+    public function isDelinquent12Months(): bool
+    {
+        return $this->invoices()
+            ->where('status', InvoiceStatus::Unpaid)
+            ->count() >= 12;
     }
 
     /**
