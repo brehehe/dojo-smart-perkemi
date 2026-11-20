@@ -77,7 +77,7 @@ class PengurusSeeder extends Seeder
             ['code' => 'PENGPROV-JATIM'],
             [
                 'type' => 'pengprov',
-                'name' => 'Pengprov PERKEMI Jawa Timur',
+                'name' => 'PERKEMI Pengprov Jawa Timur',
                 'region' => 'Jawa Timur',
                 'user_id' => $pengprovUser->id,
                 'sk_number' => 'SK-PB-023/PERKEMI/2024',
@@ -110,7 +110,7 @@ class PengurusSeeder extends Seeder
             ['code' => 'PENGKOT-SBY'],
             [
                 'type' => 'pengkot',
-                'name' => 'Pengkot PERKEMI Kota Surabaya',
+                'name' => 'PERKEMI Pengkot Kota Surabaya',
                 'region' => 'Kota Surabaya',
                 'user_id' => $pengkotUser->id,
                 'sk_number' => 'SK-PENGPROV-045/JATIM/2024',

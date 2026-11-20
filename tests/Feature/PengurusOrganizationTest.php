@@ -63,7 +63,7 @@ class PengurusOrganizationTest extends TestCase
 
         $pengkot = Pengurus::create([
             'type' => 'pengkot',
-            'name' => 'Pengkot PERKEMI Kota Surabaya',
+            'name' => 'PERKEMI Pengkot Kota Surabaya',
             'code' => 'PENGKOT-SBY',
             'region' => 'Kota Surabaya',
             'user_id' => $user->id,
@@ -77,7 +77,7 @@ class PengurusOrganizationTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('Pengurus/Pengkot')
             ->has('pengkot')
-            ->where('pengkot.name', 'Pengkot PERKEMI Kota Surabaya')
+            ->where('pengkot.name', 'PERKEMI Pengkot Kota Surabaya')
         );
     }
 
@@ -88,7 +88,7 @@ class PengurusOrganizationTest extends TestCase
 
         $pengprov = Pengurus::create([
             'type' => 'pengprov',
-            'name' => 'Pengprov PERKEMI Jawa Timur',
+            'name' => 'PERKEMI Pengprov Jawa Timur',
             'code' => 'PENGPROV-JATIM',
             'region' => 'Jawa Timur',
             'user_id' => $user->id,
@@ -102,7 +102,7 @@ class PengurusOrganizationTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('Pengurus/Pengprov')
             ->has('pengprov')
-            ->where('pengprov.name', 'Pengprov PERKEMI Jawa Timur')
+            ->where('pengprov.name', 'PERKEMI Pengprov Jawa Timur')
         );
     }
 
