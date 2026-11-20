@@ -45,7 +45,7 @@ export default function KenshisShow({ kenshi: rawKenshi }: Props) {
 
     const rank = kenshi?.rank || {
         value: 'minarai',
-        label: 'Minarai (Putih)',
+        label: 'Minarai',
         belt_color: 'white',
         is_dan: false,
     };

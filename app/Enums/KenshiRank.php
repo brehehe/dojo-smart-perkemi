@@ -26,22 +26,22 @@ enum KenshiRank: string
     public function label(): string
     {
         return match ($this) {
-            self::Minarai => 'Minarai (Putih)',
-            self::Kyu8 => 'Kyu VIII (Kuning)',
-            self::Kyu7 => 'Kyu VII (Kuning)',
-            self::Kyu6 => 'Kyu VI (Hijau)',
-            self::Kyu5 => 'Kyu V (Hijau)',
-            self::Kyu4 => 'Kyu IV (Biru)',
-            self::Kyu3 => 'Kyu III (Coklat)',
-            self::Kyu2 => 'Kyu II (Coklat)',
-            self::Kyu1 => 'Kyu I (Coklat)',
-            self::Dan1 => 'I Dan (Hitam)',
-            self::Dan2 => 'II Dan (Hitam)',
-            self::Dan3 => 'III Dan (Hitam)',
-            self::Dan4 => 'IV Dan (Hitam)',
-            self::Dan5 => 'V Dan (Hitam)',
-            self::Dan6 => 'VI Dan (Hitam)',
-            self::Dan7 => 'VII Dan (Hitam)',
+            self::Minarai => 'Minarai',
+            self::Kyu8 => 'Kyu VIII',
+            self::Kyu7 => 'Kyu VII',
+            self::Kyu6 => 'Kyu VI',
+            self::Kyu5 => 'Kyu V',
+            self::Kyu4 => 'Kyu IV',
+            self::Kyu3 => 'Kyu III',
+            self::Kyu2 => 'Kyu II',
+            self::Kyu1 => 'Kyu I',
+            self::Dan1 => 'I Dan',
+            self::Dan2 => 'II Dan',
+            self::Dan3 => 'III Dan',
+            self::Dan4 => 'IV Dan',
+            self::Dan5 => 'V Dan',
+            self::Dan6 => 'VI Dan',
+            self::Dan7 => 'VII Dan',
         };
     }
 

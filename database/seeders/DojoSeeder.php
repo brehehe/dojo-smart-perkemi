@@ -93,59 +93,5 @@ class DojoSeeder extends Seeder
                 ],
             ]
         );
-
-        // Kenshi / Atlet Dojo Surabaya
-        $surabayaKenshis = [
-            ['KNS-SBY-001', 'Bayu Pratama Wijaya', 'Bayu', 'M', KenshiRank::Dan1, 'athlete', '081345678001', 'Sawahan, Kota Surabaya', '2019-02-10', 96, 240, true],
-            ['KNS-SBY-002', 'Siti Nurhaliza Putri', 'Liza', 'F', KenshiRank::Kyu1, 'athlete', '081345678002', 'Wonokromo, Kota Surabaya', '2021-04-15', 92, 180, true],
-            ['KNS-SBY-003', 'Ahmad Farhan', 'Farhan', 'M', KenshiRank::Kyu2, 'athlete', '081345678003', 'Tegalsari, Kota Surabaya', '2022-06-20', 88, 140, false],
-            ['KNS-SBY-004', 'Dinda Ayu Maharani', 'Dinda', 'F', KenshiRank::Kyu3, 'athlete', '081345678004', 'Gubeng, Kota Surabaya', '2022-11-05', 85, 110, false],
-            ['KNS-SBY-005', 'Rizky Maulana', 'Rizky', 'M', KenshiRank::Kyu4, 'athlete', '081345678005', 'Kenjeran, Kota Surabaya', '2023-03-12', 90, 85, false],
-            ['KNS-SBY-006', 'Anisa Rahmadani', 'Anisa', 'F', KenshiRank::Kyu5, 'athlete', '081345678006', 'Sukolilo, Kota Surabaya', '2023-08-18', 82, 60, false],
-            ['KNS-SBY-007', 'Budi Santoso', 'Budi', 'M', KenshiRank::Minarai, 'athlete', '081345678007', 'Tambaksari, Kota Surabaya', '2024-01-10', 95, 30, false],
-            ['KNS-SBY-008', 'Tri Wahyudi', 'Yudi', 'M', KenshiRank::Dan2, 'athlete', '081345678008', 'Mulyorejo, Kota Surabaya', '2017-09-01', 98, 310, true],
-        ];
-
-        foreach ($surabayaKenshis as [$idCard, $name, $nick, $gender, $rank, $mType, $phone, $address, $joinedAt, $attRate, $sessions, $readyUkt]) {
-            $userEmail = strtolower(str_replace('-', '', $idCard)).'@kenshi.perkemi.id';
-            $kenshiUser = User::updateOrCreate(
-                ['email' => $userEmail],
-                [
-                    'name' => $name,
-                    'password' => $defaultPassword,
-                    'email_verified_at' => now(),
-                ]
-            );
-            $kenshiUser->syncRoles(['Kenshi']);
-
-            $isAtletPengkot = in_array($idCard, ['KNS-SBY-001', 'KNS-SBY-002', 'KNS-SBY-008', 'KNS-SBY-003']);
-            $isAtletPengprov = in_array($idCard, ['KNS-SBY-001', 'KNS-SBY-008']);
-
-            Kenshi::updateOrCreate(
-                ['id_card_number' => $idCard],
-                [
-                    'user_id' => $kenshiUser->id,
-                    'dojo_id' => $dojoSurabaya->id,
-                    'full_name' => $name,
-                    'nickname' => $nick,
-                    'gender' => $gender,
-                    'rank' => $rank,
-                    'member_type' => $mType,
-                    'is_atlet_pengkot' => $isAtletPengkot,
-                    'is_atlet_pengprov' => $isAtletPengprov,
-                    'pengkot' => 'Kota Surabaya',
-                    'pengprov' => 'Jawa Timur',
-                    'phone' => $phone,
-                    'address' => $address,
-                    'joined_at' => $joinedAt,
-                    'is_active' => true,
-                    'metadata' => [
-                        'attendance_rate' => $attRate,
-                        'total_sessions' => $sessions,
-                        'ready_for_ukt' => $readyUkt,
-                    ],
-                ]
-            );
-        }
     }
 }

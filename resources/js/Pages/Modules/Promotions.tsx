@@ -60,10 +60,10 @@ export default function Promotions({
     const [isPromotingId, setIsPromotingId] = useState<string | null>(null);
 
     const promotionTiers = [
-        { from: 'Minarai (Putih)', to: 'Kyu VIII - VII (Kuning)', reqMonths: '4 Bulan', minAttendance: '16 Sesi', status: 'Terbuka' },
-        { from: 'Kyu VI - V (Hijau)', to: 'Kyu IV (Biru)', reqMonths: '6 Bulan', minAttendance: '32 Sesi', status: 'Terbuka' },
-        { from: 'Kyu III - I (Cokelat)', to: 'Shodan (I Dan Hitam)', reqMonths: '12 Bulan', minAttendance: '48 Sesi', status: 'Verifikasi Pengprov' },
-        { from: 'I Dan (Hitam)', to: 'II Dan (Hitam)', reqMonths: '24 Bulan', minAttendance: '96 Sesi', status: 'Verifikasi Nasional PB Perkemi' },
+        { from: 'Minarai', to: 'Kyu VIII - VII', reqMonths: '4 Bulan', minAttendance: '16 Sesi', status: 'Terbuka' },
+        { from: 'Kyu VI - V', to: 'Kyu IV', reqMonths: '6 Bulan', minAttendance: '32 Sesi', status: 'Terbuka' },
+        { from: 'Kyu III - I', to: 'I Dan', reqMonths: '12 Bulan', minAttendance: '48 Sesi', status: 'Verifikasi Pengprov' },
+        { from: 'I Dan', to: 'II Dan', reqMonths: '24 Bulan', minAttendance: '96 Sesi', status: 'Verifikasi Nasional PB Perkemi' },
     ];
 
     const handlePromote = (candidate: PromotionCandidate) => {

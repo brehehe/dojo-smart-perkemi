@@ -48,19 +48,19 @@ class ReportController extends Controller
                 'total_attendances' => $attendancesCount,
                 'today_attendances' => Attendance::where('kenshi_id', $selfKenshi->id)->whereDate('created_at', today())->count(),
                 'total_evaluations' => (clone $evaluationsQuery)->count(),
-                'avg_evaluation_score' => (int) round((clone $evaluationsQuery)->avg('overall_score') ?? 0),
+                'avg_evaluation_score' => (int) round((float) ((clone $evaluationsQuery)->avg('overall_score') ?? 0)),
                 'ready_ukt_count' => $attendancesCount >= 16 ? 1 : 0,
                 'total_independent_trainings' => (clone $independentQuery)->count(),
                 'total_training_minutes' => (int) (clone $independentQuery)->sum('duration_minutes'),
             ];
 
             $aspectAverages = [
-                'technique' => (int) round((clone $evaluationsQuery)->avg('technique_score') ?? 80),
-                'embu' => (int) round((clone $evaluationsQuery)->avg('embu_score') ?? 80),
-                'randori' => (int) round((clone $evaluationsQuery)->avg('randori_score') ?? 75),
-                'physical' => (int) round((clone $evaluationsQuery)->avg('physical_score') ?? 85),
-                'discipline' => (int) round((clone $evaluationsQuery)->avg('discipline_score') ?? 90),
-                'overall' => (int) round((clone $evaluationsQuery)->avg('overall_score') ?? 82),
+                'technique' => (int) round((float) ((clone $evaluationsQuery)->avg('technique_score') ?? 80)),
+                'embu' => (int) round((float) ((clone $evaluationsQuery)->avg('embu_score') ?? 80)),
+                'randori' => (int) round((float) ((clone $evaluationsQuery)->avg('randori_score') ?? 75)),
+                'physical' => (int) round((float) ((clone $evaluationsQuery)->avg('physical_score') ?? 85)),
+                'discipline' => (int) round((float) ((clone $evaluationsQuery)->avg('discipline_score') ?? 90)),
+                'overall' => (int) round((float) ((clone $evaluationsQuery)->avg('overall_score') ?? 82)),
             ];
 
             $recentEvaluations = (clone $evaluationsQuery)->with('coach')->latest('evaluation_date')->take(6)->get();
@@ -81,7 +81,7 @@ class ReportController extends Controller
             ]]);
         } else {
             $totalEvaluations = CoachEvaluation::count();
-            $avgScore = $totalEvaluations > 0 ? (int) round(CoachEvaluation::avg('overall_score')) : 82;
+            $avgScore = $totalEvaluations > 0 ? (int) round((float) (CoachEvaluation::avg('overall_score') ?? 82)) : 82;
             $totalIndependent = IndependentTraining::count();
             $totalMinutes = (int) IndependentTraining::sum('duration_minutes');
 
@@ -102,11 +102,11 @@ class ReportController extends Controller
             ];
 
             $aspectAverages = [
-                'technique' => (int) round(CoachEvaluation::avg('technique_score') ?? 84),
-                'embu' => (int) round(CoachEvaluation::avg('embu_score') ?? 82),
-                'randori' => (int) round(CoachEvaluation::avg('randori_score') ?? 78),
-                'physical' => (int) round(CoachEvaluation::avg('physical_score') ?? 85),
-                'discipline' => (int) round(CoachEvaluation::avg('discipline_score') ?? 91),
+                'technique' => (int) round((float) (CoachEvaluation::avg('technique_score') ?? 84)),
+                'embu' => (int) round((float) (CoachEvaluation::avg('embu_score') ?? 82)),
+                'randori' => (int) round((float) (CoachEvaluation::avg('randori_score') ?? 78)),
+                'physical' => (int) round((float) (CoachEvaluation::avg('physical_score') ?? 85)),
+                'discipline' => (int) round((float) (CoachEvaluation::avg('discipline_score') ?? 91)),
                 'overall' => $avgScore,
             ];
 

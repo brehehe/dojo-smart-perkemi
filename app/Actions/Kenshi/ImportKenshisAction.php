@@ -109,7 +109,11 @@ class ImportKenshisAction
                 if (! $rankEnum) {
                     // Try case-insensitive matching
                     foreach (KenshiRank::cases() as $case) {
-                        if (strcasecmp($case->value, $rankInput) === 0 || strcasecmp($case->label(), $rankInput) === 0) {
+                        if (
+                            strcasecmp($case->value, $rankInput) === 0
+                            || strcasecmp($case->label(), $rankInput) === 0
+                            || stripos($rankInput, $case->label()) !== false
+                        ) {
                             $rankEnum = $case;
                             break;
                         }
